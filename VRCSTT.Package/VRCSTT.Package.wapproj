@@ -56,12 +56,12 @@
     <DefaultLanguage>de-DE</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
-    <EntryPointProjectUniqueName>..\VRCSTT\VRCSTT.csproj</EntryPointProjectUniqueName>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <EntryPointProjectUniqueName>..\VRCSTT.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <AppxBundle>Always</AppxBundle>
@@ -113,6 +113,6 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VRCSTT\VRCSTT.csproj" />
+    <ProjectReference Include="..\VRCSTT.csproj" />
   </ItemGroup>
 </Project>
