@@ -1,9 +1,10 @@
 name: "Deploy VRCSTT"
 
-on : 
-  push: 
-    tags: 
-      -"vrcstt/v*"
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
       
 env:
   PROJECT_PATH: VRCSTT.csproj
@@ -23,21 +24,22 @@ jobs:
       
       - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
       
-      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true --no-build
+      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true --no-build -o Program
       
       - uses: actions/create-release@v1
         id: create_release
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
-          tag_name: ${{ github.ref }}
+          tag_name: v${{ github.run_number }}
           
-      - uses: montudor/action-zip@v1
+      - uses: vimtor/action-zip@v1
         with:
-          args: zip -qq -r bin/Release/net6.0-windows/win-x64/VRCSTT.zip bin/Release/net6.0-windows/win-x64/publish/
+          files: Program
+          dest: VRCSTTv${{ github.run_number }}.zip
           
       - uses: csexton/release-asset-action@v2
         with: 
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pattern: bin/Release/net6.0-windows/win-x64/VRCSTT.zip
+          pattern: VRCSTTv${{ github.run_number }}.zip
           release-url: ${{ steps.create_release.outputs.upload_url }}
