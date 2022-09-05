@@ -36,10 +36,10 @@ jobs:
       - uses: vimtor/action-zip@v1
         with:
           files: Program
-          dest: VRCSTT.zip
+          dest: VRCSTTv${{ github.run_number }}.zip
           
       - uses: csexton/release-asset-action@v2
         with: 
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pattern: VRCSTT.zip
+          pattern: VRCSTTv${{ github.run_number }}.zip
           release-url: ${{ steps.create_release.outputs.upload_url }}
