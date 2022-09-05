@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	  
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <SelfContained>true</SelfContained>
+	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	  <PublishReadyToRun>true</PublishReadyToRun>
+	  
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>S:\VS\STT\VRCSTT\Backup\</UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.23.0" />
+    <PackageReference Include="OscCore" Version="1.0.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
