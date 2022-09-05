@@ -2,6 +2,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
+
+	  <RuntimeIdentifiers>win-x86;win10-x64</RuntimeIdentifiers>
+	  
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <FileUpgradeFlags>40</FileUpgradeFlags>
