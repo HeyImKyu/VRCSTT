@@ -8,10 +8,30 @@ namespace VRCSTT.Config
 {
     internal static class STTConfig
     {
-        internal static string SubscriptionKey = "f5241ab63dea4f008e8c04dfab3420ce";
-        internal static string Region = "germanywestcentral";
+        private static ConfigProvider instance;
+
+        internal static string SubscriptionKey => GetSubscriptionKey();
+        internal static string Region => GetRegionKey(); 
 
         internal static string Address = "127.0.0.1";
         internal static int Port = 9000;
+
+        private static string GetSubscriptionKey()
+        {
+            CreateInstance();
+            return instance.GetSubscriptionKey();
+        }
+
+        private static string GetRegionKey()
+        {
+            CreateInstance();
+            return instance.GetRegion();
+        }
+
+        private static void CreateInstance()
+        {
+            if (instance == null)
+                instance = new ConfigProvider();
+        }
     }
 }

@@ -13,6 +13,9 @@ namespace VRCSTT
     {
         internal static string StartSpeaking(string language)
         {
+            if (STTConfig.SubscriptionKey == "" || STTConfig.SubscriptionKey == null || STTConfig.Region == "" || STTConfig.Region == null)
+                return "Error: Please set SubscriptionKey and Region inside the config file!";
+
             var speechConfig = SpeechConfig.FromSubscription(STTConfig.SubscriptionKey, STTConfig.Region);
             speechConfig.SpeechRecognitionLanguage = language;
 
@@ -22,7 +25,6 @@ namespace VRCSTT
             var speechRecognitionResult = speechRecognizer.RecognizeOnceAsync().Result;
             return OutputSpeechRecognitionResult(speechRecognitionResult);
         }
-
 
         private static string OutputSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult)
         {
