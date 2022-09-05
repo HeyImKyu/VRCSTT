@@ -35,11 +35,11 @@ jobs:
           
       - uses: vimtor/action-zip@v1
         with:
-          files: bin/Release/net6.0-windows/win-x64/publish/*
-          dest: bin/Release/net6.0-windows/win-x64/VRCSTT.zip
+          files: VRCSTT/bin/Release/net6.0-windows/win-x64/publish/*
+          dest: VRCSTT/bin/Release/net6.0-windows/win-x64/VRCSTT.zip
           
       - uses: csexton/release-asset-action@v2
         with: 
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          pattern: bin/Release/net6.0-windows/win-x64/VRCSTT.zip
+          pattern: VRCSTT/bin/Release/net6.0-windows/win-x64/VRCSTT.zip
           release-url: ${{ steps.create_release.outputs.upload_url }}
