@@ -1,0 +1,14 @@
+﻿<Window x:Class="VRCSTT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VRCSTT"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Click="Button_Click" Content="click me" Margin="298,111,298,254"/>
+        <TextBox x:Name="OutputTextbox" HorizontalAlignment="Left" Margin="166,291,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="443" Height="117"/>
+        <ComboBox x:Name="LanguageBox" HorizontalAlignment="Left" Height="24" Margin="10,31,0,0" VerticalAlignment="Top" Width="140" ItemsSource="{Binding Languages}"/>
+    </Grid>
+</Window>
