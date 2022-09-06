@@ -11,7 +11,7 @@ namespace VRCSTT.ViewModel
         {
             Regex.Replace(text, "[@\\\"'\\\\]", string.Empty);
             var client = new OscClient(STTConfig.Address, STTConfig.Port);
-            var message = new OscMessage("/chatbox/input", text.Replace("\\", ""), true);
+            var message = new OscMessage("/chatbox/input", Regex.Replace(text, "[^0-9a-zA-Z!,.'&:;_%/*+ -]", ""), true);
             client.SendAsync(message);
             client.Dispose();
 
