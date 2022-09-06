@@ -4,6 +4,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using VRCSTT.Config;
+using VRCSTT.Helper;
 using VRCSTT.UDT;
 
 namespace VRCSTT.ViewModel
@@ -49,26 +50,6 @@ namespace VRCSTT.ViewModel
                     break;
             }
             return "";
-        }
-
-        static string Latinize(this string text)
-        {
-            var normalizedString = text.Normalize(NormalizationForm.FormD);
-            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
-
-            for (int i = 0; i < normalizedString.Length; i++)
-            {
-                char c = normalizedString[i];
-                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
-                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
-                {
-                    stringBuilder.Append(c);
-                }
-            }
-
-            return stringBuilder
-                .ToString()
-                .Normalize(NormalizationForm.FormC);
         }
     }
 }
