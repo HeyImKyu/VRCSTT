@@ -8,7 +8,7 @@ env:
   PROJECT_PATH: VRCSTT.csproj
 
 jobs: 
-  deploy: 
+  test_vrcstt: 
     runs-on: windows-latest
     steps: 
       - uses: actions/checkout@v2
