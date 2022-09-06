@@ -1,8 +1,9 @@
 ﻿using OscCore;
 using System.Text.RegularExpressions;
 using VRCSTT.Config;
+using VRCSTT.UDT;
 
-namespace VRCSTT
+namespace VRCSTT.ViewModel
 {
     internal static class OSCHandler 
     { 
