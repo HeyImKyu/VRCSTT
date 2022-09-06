@@ -4,11 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRCSTT"
+        xmlns:converters="clr-namespace:VRCSTT.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
+    
     <Grid>
-        <Button Click="Button_Click" Content="click me" Margin="298,111,298,254"/>
-        <TextBox x:Name="OutputTextbox" HorizontalAlignment="Left" Margin="166,291,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="443" Height="117"/>
-        <ComboBox x:Name="LanguageBox" HorizontalAlignment="Left" Height="24" Margin="10,31,0,0" VerticalAlignment="Top" Width="140" ItemsSource="{Binding Languages}"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <Button Command="{Binding StartRecording}" Content="click me" Grid.Column="2" Grid.Row="1" Margin="10"/>
+        <TextBox x:Name="OutputTextbox" Text="{Binding TextboxText}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="5"/>
+
+
+        <StackPanel Orientation="Vertical" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="10 10 50 10">
+            <ComboBox x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" IsEditable="False"/>
+            <CheckBox x:Name="StandardMic" Content="Use Standard Mic" IsChecked="{Binding UseStandardMic}" Margin="0 20 0 0"/>
+            <ComboBox x:Name="MicrophoneBox"  ItemsSource="{Binding Microphones}" SelectedItem="{Binding SelectedMicrophone}" DisplayMemberPath="FriendlyName" IsEnabled="{Binding Path=UseStandardMic, Converter={StaticResource InverseBooleanConverter}}" Margin="0 10 0 0"/>
+        </StackPanel>
     </Grid>
 </Window>

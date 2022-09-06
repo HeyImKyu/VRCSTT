@@ -1,17 +1,14 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VRCSTT.Config;
+using VRCSTT.UDT;
 
-namespace VRCSTT
+namespace VRCSTT.ViewModel
 {
     internal static class STTHandler
     {
-        internal static string StartSpeaking(string language)
+        internal static string StartSpeaking(string language, Microphone microphone, bool useStandardMic)
         {
             if (STTConfig.SubscriptionKey == "" || STTConfig.SubscriptionKey == null || STTConfig.Region == "" || STTConfig.Region == null)
                 return "Error: Please set SubscriptionKey and Region inside the config file!";
@@ -19,7 +16,7 @@ namespace VRCSTT
             var speechConfig = SpeechConfig.FromSubscription(STTConfig.SubscriptionKey, STTConfig.Region);
             speechConfig.SpeechRecognitionLanguage = language;
 
-            using var audioConfig = AudioConfig.FromDefaultMicrophoneInput();
+            using var audioConfig = useStandardMic ? AudioConfig.FromDefaultMicrophoneInput() : AudioConfig.FromMicrophoneInput(microphone.ID);
             using var speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
             var speechRecognitionResult = speechRecognizer.RecognizeOnceAsync().Result;
