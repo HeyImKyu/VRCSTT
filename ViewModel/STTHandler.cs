@@ -1,6 +1,8 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System;
+using System.Globalization;
+using System.Text;
 using VRCSTT.Config;
 using VRCSTT.UDT;
 
@@ -25,11 +27,12 @@ namespace VRCSTT.ViewModel
 
         private static string OutputSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult)
         {
+            string result = speechRecognitionResult.Text.Latinize();
             switch (speechRecognitionResult.Reason)
             {
                 case ResultReason.RecognizedSpeech:
-                    OSCHandler.SendOverOSC(speechRecognitionResult.Text);
-                    return speechRecognitionResult.Text;
+                    OSCHandler.SendOverOSC(result);
+                    return result;
                 case ResultReason.NoMatch:
                     Console.WriteLine($"NOMATCH: Speech could not be recognized.");
                     break;
@@ -46,6 +49,26 @@ namespace VRCSTT.ViewModel
                     break;
             }
             return "";
+        }
+
+        static string Latinize(this string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                char c = normalizedString[i];
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder
+                .ToString()
+                .Normalize(NormalizationForm.FormC);
         }
     }
 }
