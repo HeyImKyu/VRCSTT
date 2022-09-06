@@ -1,5 +1,9 @@
 name: "Test VRCSTT"
-      
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    
 env:
   PROJECT_PATH: VRCSTT.csproj
 
