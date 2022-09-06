@@ -9,9 +9,8 @@ namespace VRCSTT.ViewModel
     { 
         internal static void SendOverOSC(string text)
         {
-            Regex.Replace(text, "[@\\\"'\\\\]", string.Empty);
             var client = new OscClient(STTConfig.Address, STTConfig.Port);
-            var message = new OscMessage("/chatbox/input", Regex.Replace(text, "[^0-9a-zA-Z!,.'&:;_%/*+ -]", ""), true);
+            var message = new OscMessage("/chatbox/input", text);
             client.SendAsync(message);
             client.Dispose();
 
