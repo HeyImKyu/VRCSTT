@@ -1,0 +1,24 @@
+name: "Test VRCSTT"
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    
+env:
+  PROJECT_PATH: VRCSTT.csproj
+
+jobs: 
+  test_vrcstt: 
+    runs-on: windows-latest
+    steps: 
+      - uses: actions/checkout@v2
+      
+      - uses: actions/setup-dotnet@v1
+        with: 
+          dotnet-version: 6.0.x
+          
+      - run: dotnet restore ${{ env.PROJECT_PATH }}
+      
+      - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
+      
+      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true --no-build -o Program
