@@ -74,18 +74,24 @@ namespace VRCSTT.ViewModel
             set { m_TextboxText = value; NotifyPropertyChanged(); }
         }
 
+        private ObservableCollection<HistoryPoint> m_VoiceHistory = new ObservableCollection<HistoryPoint>();
+        public ObservableCollection<HistoryPoint> VoiceHistory
+        {
+            get { return m_VoiceHistory; }
+            set { m_VoiceHistory = value; NotifyPropertyChanged(); }
+        }
+
+
         #endregion
 
         #region Commands
 
         private ICommand m_StartRecording;
-
-
         public ICommand StartRecording
         {
             get
             {
-                return m_StartRecording ?? (m_StartRecording = new CommandHandler(() => DoStartRecording(), () => true));
+                return m_StartRecording ?? (m_StartRecording = new CommandHandler(o => DoStartRecording(), () => true));
             }
         }
 
@@ -95,7 +101,12 @@ namespace VRCSTT.ViewModel
         private void DoStartRecording()
         {
             OSCHandler.IsTyping(true);
-            this.TextboxText = STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic);
+
+            var result = STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic);
+
+            this.TextboxText = result; 
+            OSCHandler.SendOverOSC(result);
+            this.AddHistoryPoint(result);
         }
 
         private void SetMicrophones()
@@ -107,6 +118,16 @@ namespace VRCSTT.ViewModel
             {
                 m_Microphones.Add(new Microphone() { FriendlyName = endpoint.FriendlyName, ID = endpoint.ID });
             }
+        }
+
+        private void AddHistoryPoint(string voiceString)
+        {
+            if (m_VoiceHistory.Count >= 5)
+                m_VoiceHistory.RemoveAt(0);
+
+            var point = new HistoryPoint() { text = voiceString, ID = Guid.NewGuid() };
+
+            VoiceHistory.Add(point);
         }
 
         #endregion

@@ -10,7 +10,7 @@ namespace VRCSTT.ViewModel
         internal static void SendOverOSC(string text)
         {
             var client = new OscClient(STTConfig.Address, STTConfig.Port);
-            var message = new OscMessage("/chatbox/input", text);
+            var message = new OscMessage("/chatbox/input", text, true);
             client.SendAsync(message);
             client.Dispose();
 

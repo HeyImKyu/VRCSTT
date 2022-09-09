@@ -1,5 +1,6 @@
 ﻿using OscCore;
 using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,10 @@ namespace VRCSTT.UDT
             return client.SendAsync(data, data.Length);
         }
 
-        public void Dispose() => cts.Cancel();
+        public void Dispose()
+        {
+            cts.Cancel();
+            this.client.Dispose();
+        }
     }
 }

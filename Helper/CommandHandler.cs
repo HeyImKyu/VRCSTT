@@ -5,7 +5,7 @@ namespace VRCSTT.Helper
 {
     public class CommandHandler : ICommand
     {
-        private Action _action;
+        private Action<object> _action;
         private Func<bool> _canExecute;
 
         /// <summary>
@@ -13,7 +13,7 @@ namespace VRCSTT.Helper
         /// </summary>
         /// <param name="action">Action to be executed by the command</param>
         /// <param name="canExecute">A bolean property to containing current permissions to execute the command</param>
-        public CommandHandler(Action action, Func<bool> canExecute)
+        public CommandHandler(Action<object> action, Func<bool> canExecute)
         {
             _action = action;
             _canExecute = canExecute;
@@ -40,7 +40,7 @@ namespace VRCSTT.Helper
 
         public void Execute(object parameter)
         {
-            _action();
+            _action(parameter);
         }
     }
 }
