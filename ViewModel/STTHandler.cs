@@ -32,7 +32,6 @@ namespace VRCSTT.ViewModel
             switch (speechRecognitionResult.Reason)
             {
                 case ResultReason.RecognizedSpeech:
-                    OSCHandler.SendOverOSC(result);
                     return result;
                 case ResultReason.NoMatch:
                     Console.WriteLine($"NOMATCH: Speech could not be recognized.");
