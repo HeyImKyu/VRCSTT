@@ -23,6 +23,8 @@ namespace VRCSTT.ViewModel
             using var speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
             var speechRecognitionResult = speechRecognizer.RecognizeOnceAsync().Result;
+
+            speechRecognizer.Dispose();
             return OutputSpeechRecognitionResult(speechRecognitionResult);
         }
 
