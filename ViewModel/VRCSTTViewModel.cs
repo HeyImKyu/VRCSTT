@@ -96,7 +96,7 @@ namespace VRCSTT.ViewModel
             set { m_VoiceHistory = value; NotifyPropertyChanged(); }
         }
 
-        private Visibility m_OSCIncoming = Visibility.Hidden;
+        private Visibility m_OSCIncoming = Visibility.Collapsed;
 
         public Visibility MicActivationVisible
         {
@@ -131,7 +131,7 @@ namespace VRCSTT.ViewModel
 
             var result = await speakTask;
 
-            MicActivationVisible = Visibility.Hidden;
+            MicActivationVisible = Visibility.Collapsed;
 
             this.TextboxText = result; 
             OSCHandler.SendOverOSC(result);
