@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using VRCSTT.Helper;
 using VRCSTT.UDT;
+using NAudio.Wave;
+using System.Drawing;
 
 namespace VRCSTT.ViewModel
 {
@@ -56,7 +58,11 @@ namespace VRCSTT.ViewModel
         public Microphone SelectedMicrophone
         {
             get { return m_SelectedMicrophone; }
-            set { m_SelectedMicrophone = value; NotifyPropertyChanged(); }
+            set 
+            {
+                this.AutoMic = false;
+                m_SelectedMicrophone = value; NotifyPropertyChanged();
+            }
         }
 
         private bool m_UseStandardMic;
@@ -66,8 +72,27 @@ namespace VRCSTT.ViewModel
             set { m_UseStandardMic = value; NotifyPropertyChanged(); }
         }
 
-        private string m_TextboxText;
+        private bool m_AutoMic;
+        public bool AutoMic
+        {
+            get { return m_AutoMic; }
+            set 
+            { 
+                if (SelectedMicrophone != null)
+                {
+                    if (value)
+                    {                    
+                        SelectedMicrophone.AudioWave.StartRecording();
+                    }
+                    else
+                        SelectedMicrophone.AudioWave.StopRecording();
+                }
 
+                m_AutoMic = value; NotifyPropertyChanged();
+            }
+        }
+
+        private string m_TextboxText;
         public string TextboxText
         {
             get { return m_TextboxText; }
@@ -79,6 +104,13 @@ namespace VRCSTT.ViewModel
         {
             get { return m_VoiceHistory; }
             set { m_VoiceHistory = value; NotifyPropertyChanged(); }
+        }
+
+        private double m_MicrophoneLevel;
+        public double MicrophoneLevel
+        {
+            get { return m_MicrophoneLevel; }
+            set { m_MicrophoneLevel = value; NotifyPropertyChanged(); }
         }
 
 
@@ -93,6 +125,23 @@ namespace VRCSTT.ViewModel
             {
                 return m_StartRecording ?? (m_StartRecording = new CommandHandler(o => DoStartRecording(), () => true));
             }
+        }
+
+        private void AudioWaveHandler(object? sender, WaveInEventArgs e)
+        {
+            // copy buffer into an array of integers
+            Int16[] values = new Int16[e.Buffer.Length / 2];
+            Buffer.BlockCopy(e.Buffer, 0, values, 0, e.Buffer.Length);
+
+            // determine the highest value as a fraction of the maximum possible value
+            float fraction = (float)values.Max() / 32768;
+
+            if (fraction > .2)
+            {
+                DoStartRecording();
+            }
+
+            this.MicrophoneLevel = fraction;
         }
 
         #endregion
@@ -113,10 +162,14 @@ namespace VRCSTT.ViewModel
         {
             m_Microphones.Clear();
             var enumerator = new MMDeviceEnumerator();
-            foreach (var endpoint in
-                     enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
+            var endpointList = enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+            for (int i = 0; i < endpointList.Count(); i++)
             {
-                m_Microphones.Add(new Microphone() { FriendlyName = endpoint.FriendlyName, ID = endpoint.ID });
+                var endpoint = endpointList[i];
+                var mic = new Microphone(endpoint, i);
+                mic.AudioWave.DataAvailable += AudioWaveHandler;
+
+                m_Microphones.Add(mic);
             }
         }
 
@@ -127,7 +180,7 @@ namespace VRCSTT.ViewModel
 
             var point = new HistoryPoint() { text = voiceString, ID = Guid.NewGuid() };
 
-            VoiceHistory.Add(point);
+            this.m_VoiceHistory.Add(point);
         }
 
         #endregion
