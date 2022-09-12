@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -29,6 +30,8 @@ namespace VRCSTT.ViewModel
             this.UseStandardMic = true;
 
             this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
+
+            this.cancellationTokenSource = new CancellationTokenSource();
         }
 
         #endregion
@@ -36,6 +39,8 @@ namespace VRCSTT.ViewModel
         #region Attributes
 
         private readonly IncomingOscClient incomingOscClient;
+        public CancellationTokenSource cancellationTokenSource { get; private set; }
+        public Task<string> RunningTask { get; private set; }
 
         #endregion
 
@@ -82,7 +87,6 @@ namespace VRCSTT.ViewModel
         }
 
         private string m_TextboxText;
-
         public string TextboxText
         {
             get { return m_TextboxText; }
@@ -96,14 +100,12 @@ namespace VRCSTT.ViewModel
             set { m_VoiceHistory = value; NotifyPropertyChanged(); }
         }
 
-        private Visibility m_OSCIncoming = Visibility.Hidden;
-
+        private Visibility m_OSCIncoming = Visibility.Collapsed;
         public Visibility MicActivationVisible
         {
             get { return m_OSCIncoming; }
             set { m_OSCIncoming = value; NotifyPropertyChanged(); }
         }
-
 
         #endregion
 
@@ -124,16 +126,31 @@ namespace VRCSTT.ViewModel
 
         private async void DoStartRecording()
         {
+            // Cancel recording if currently running
+            if (RunningTask != null && !cancellationTokenSource.Token.IsCancellationRequested && !RunningTask.IsCompleted)
+            {
+                STTHandler.AbortSpeaking();
+                cancellationTokenSource.Cancel();
+                MicActivationVisible = Visibility.Collapsed;
+                return;
+            }
+
+            cancellationTokenSource = new CancellationTokenSource();
             OSCHandler.IsTyping(true);
 
-            var speakTask = Task.Run(() => STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic));
+            var speakTask = Task.Run(() => STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic, cancellationTokenSource.Token));
+            this.RunningTask = speakTask;
             MicActivationVisible = Visibility.Visible;
+
 
             var result = await speakTask;
 
-            MicActivationVisible = Visibility.Hidden;
+            MicActivationVisible = Visibility.Collapsed;
 
-            this.TextboxText = result; 
+            if (result == "")
+                return;
+
+            this.TextboxText = result;
             OSCHandler.SendOverOSC(result);
             this.AddHistoryPoint(result);
         }
@@ -142,8 +159,7 @@ namespace VRCSTT.ViewModel
         {
             m_Microphones.Clear();
             var enumerator = new MMDeviceEnumerator();
-            foreach (var endpoint in
-                     enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
+            foreach (var endpoint in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
             {
                 m_Microphones.Add(new Microphone() { FriendlyName = endpoint.FriendlyName, ID = endpoint.ID });
             }
