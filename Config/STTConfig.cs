@@ -14,7 +14,8 @@ namespace VRCSTT.Config
         internal static string Region => GetRegionKey(); 
 
         internal static string Address = "127.0.0.1";
-        internal static int Port = 9000;
+        internal static int OutgoingPort = 9000;
+        internal static int IncomingPort = 9001;
 
         private static string GetSubscriptionKey()
         {
