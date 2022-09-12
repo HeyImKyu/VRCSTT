@@ -1,10 +1,17 @@
 ﻿using NAudio.CoreAudioApi;
+using OscCore;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using VRCSTT.Config;
 using VRCSTT.Helper;
 using VRCSTT.UDT;
 
@@ -20,7 +27,15 @@ namespace VRCSTT.ViewModel
 
             this.SelectedMicrophone = this.Microphones.FirstOrDefault();
             this.UseStandardMic = true;
+
+            this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
         }
+
+        #endregion
+
+        #region Attributes
+
+        private readonly IncomingOscClient incomingOscClient;
 
         #endregion
 
@@ -81,6 +96,14 @@ namespace VRCSTT.ViewModel
             set { m_VoiceHistory = value; NotifyPropertyChanged(); }
         }
 
+        private Visibility m_OSCIncoming = Visibility.Hidden;
+
+        public Visibility MicActivationVisible
+        {
+            get { return m_OSCIncoming; }
+            set { m_OSCIncoming = value; NotifyPropertyChanged(); }
+        }
+
 
         #endregion
 
@@ -98,11 +121,17 @@ namespace VRCSTT.ViewModel
         #endregion
 
         #region Methods
-        private void DoStartRecording()
+
+        private async void DoStartRecording()
         {
             OSCHandler.IsTyping(true);
 
-            var result = STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic);
+            var speakTask = Task.Run(() => STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic));
+            MicActivationVisible = Visibility.Visible;
+
+            var result = await speakTask;
+
+            MicActivationVisible = Visibility.Hidden;
 
             this.TextboxText = result; 
             OSCHandler.SendOverOSC(result);
@@ -123,11 +152,19 @@ namespace VRCSTT.ViewModel
         private void AddHistoryPoint(string voiceString)
         {
             if (m_VoiceHistory.Count >= 5)
-                m_VoiceHistory.RemoveAt(0);
+            {
+                App.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    m_VoiceHistory.RemoveAt(0);
+                });
+            }
 
             var point = new HistoryPoint() { text = voiceString, ID = Guid.NewGuid() };
 
-            VoiceHistory.Add(point);
+            App.Current.Dispatcher.Invoke((Action)delegate
+            {
+                m_VoiceHistory.Add(point);
+            });
         }
 
         #endregion
@@ -136,6 +173,23 @@ namespace VRCSTT.ViewModel
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void ReceiveIncomingCallback(IAsyncResult ar)
+        {
+            UdpClient u = ((UdpState)(ar.AsyncState)).client;
+            IPEndPoint e = ((UdpState)(ar.AsyncState)).endpoint;
+
+            byte[] receiveBytes = u.EndReceive(ar, ref e);
+            string receiveString = Encoding.ASCII.GetString(receiveBytes);
+            OscMessage pack = (OscMessage)OscPacket.Read(receiveBytes, 0, receiveBytes.Length);
+
+            if (pack.Address == "/avatar/parameters/StartVoiceRecognition" && ((bool)pack.FirstOrDefault()))
+                DoStartRecording();
+
+            if (this.incomingOscClient != null)
+                this.incomingOscClient.BeginReceiving();
+
         }
     }
 }

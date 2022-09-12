@@ -17,7 +17,16 @@ Welcome to my implementation of a speech-to-text tool for the VRChat textbox.
  - Open the file 'VRCSTT.dll.config'
  - Place the SubscriptionKey and the Region of you Azure speech-recognition service inside the 'Value'-fields.
  - Run 'VRCSTT.exe'
- 
+ - Make sure that OSC is enabled ingame (Circle Menu -> Options -> OSC -> Enabled)
+
+ # SETUP WITH AVATAR PARAMETER
+
+ - Follow the normal setup above
+ - Add an ExpressionParameter to your avatar called "StartVoiceRecognition" (boolean, default false)
+
+ Voice recognition will now start any time you set the "StartVoiceRecognition"-Parameter to true.
+ You can do that easily by adding a "Button" to your ExpressionMenu that activates this parameter.
+
  \
  \
  \

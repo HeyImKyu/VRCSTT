@@ -10,7 +10,7 @@
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -25,10 +25,14 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
+
         <Button Command="{Binding StartRecording}" Content="click me" Grid.Column="2" Grid.Row="1" Margin="10"/>
         <TextBox x:Name="OutputTextbox" Text="{Binding TextboxText}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="5"/>
 
+        <Border Grid.Row="1" Grid.Column="3" Background="Red" Visibility="{Binding MicActivationVisible}" CornerRadius="500" VerticalAlignment="Center" HorizontalAlignment="Center" Width="100" Height="100" >
+            <!--<TextBlock Text="OSC INCOMING" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>-->
+            <Path Fill="White" Data="M176 352c53.02 0 96-42.98 96-96V96c0-53.02-42.98-96-96-96S80 42.98 80 96v160c0 53.02 42.98 96 96 96zm160-160h-16c-8.84 0-16 7.16-16 16v48c0 74.8-64.49 134.82-140.79 127.38C96.71 376.89 48 317.11 48 250.3V208c0-8.84-7.16-16-16-16H16c-8.84 0-16 7.16-16 16v40.16c0 89.64 63.97 169.55 152 181.69V464H96c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16h-56v-33.77C285.71 418.47 352 344.9 352 256v-48c0-8.84-7.16-16-16-16z" Stretch="Uniform" Margin="15"/>
+        </Border>
 
         <StackPanel Orientation="Vertical" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="10 10 50 10">
             <ComboBox x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" IsEditable="False"/>
