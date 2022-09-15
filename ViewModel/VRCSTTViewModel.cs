@@ -120,6 +120,26 @@ namespace VRCSTT.ViewModel
             }
         }
 
+        private ICommand m_TextboxFocusCommand;
+        public ICommand TextboxFocusCommand
+        {
+            get
+            {
+                return m_TextboxFocusCommand ?? (m_TextboxFocusCommand = new CommandHandler(o => DoStartFocus(), () => true));
+            }
+        }
+
+
+        private ICommand m_TextboxEnterCommand;
+        public ICommand TextboxEnterCommand
+        {
+            get
+            {
+                return m_TextboxEnterCommand ?? (m_TextboxEnterCommand = new CommandHandler(o => DoSendTextbox(), () => true));
+            }
+        }
+
+
         #endregion
 
         #region Methods
@@ -153,6 +173,18 @@ namespace VRCSTT.ViewModel
             this.TextboxText = result;
             OSCHandler.SendOverOSC(result);
             this.AddHistoryPoint(result);
+        }
+
+        private void DoStartFocus()
+        {
+            TextboxText = "";
+        }
+
+        private void DoSendTextbox()
+        {
+            OSCHandler.SendOverOSC(TextboxText);
+            this.AddHistoryPoint(TextboxText);
+            this.TextboxText = "";
         }
 
         private void SetMicrophones()

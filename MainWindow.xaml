@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VRCSTT"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converters="clr-namespace:VRCSTT.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -61,7 +62,16 @@
                 </Border>
             </StackPanel>
         </Button>
-        <TextBox x:Name="OutputTextbox" Text="{Binding TextboxText}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="5"/>
+        <TextBox x:Name="OutputTextbox" Text="{Binding TextboxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="3" Margin="5">
+            <TextBox.InputBindings>
+                <KeyBinding Command="{Binding TextboxEnterCommand}" Key="Enter" />
+            </TextBox.InputBindings>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="GotFocus">
+                    <i:InvokeCommandAction Command="{Binding TextboxFocusCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </TextBox>
 
         <StackPanel Orientation="Vertical" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="10 10 50 10">
             <ComboBox x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" IsEditable="False"/>
