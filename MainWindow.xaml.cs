@@ -16,5 +16,10 @@ namespace VRCSTT
             this.vm = new VRCSTTViewModel();
             this.DataContext = this.vm;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.vm.WindowClosing();
+        }
     }
 }

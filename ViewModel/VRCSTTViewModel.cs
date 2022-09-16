@@ -3,11 +3,13 @@ using OscCore;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,6 +34,8 @@ namespace VRCSTT.ViewModel
             this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
 
             this.cancellationTokenSource = new CancellationTokenSource();
+
+            LoadFavourites();
         }
 
         #endregion
@@ -41,6 +45,7 @@ namespace VRCSTT.ViewModel
         private readonly IncomingOscClient incomingOscClient;
         public CancellationTokenSource cancellationTokenSource { get; private set; }
         public Task<string> RunningTask { get; private set; }
+        private const string FavouritesFilePath = ".\\Favourites.save";
 
         #endregion
 
@@ -100,6 +105,13 @@ namespace VRCSTT.ViewModel
             set { m_VoiceHistory = value; NotifyPropertyChanged(); }
         }
 
+        private ObservableCollection<HistoryPoint> m_Favourites = new ObservableCollection<HistoryPoint>();
+        public ObservableCollection<HistoryPoint> Favourites
+        {
+            get { return m_Favourites; }
+            set { m_Favourites = value; NotifyPropertyChanged(); }
+        }
+
         private Visibility m_OSCIncoming = Visibility.Collapsed;
         public Visibility MicActivationVisible
         {
@@ -119,6 +131,26 @@ namespace VRCSTT.ViewModel
                 return m_StartRecording ?? (m_StartRecording = new CommandHandler(o => DoStartRecording(), () => true));
             }
         }
+
+        private ICommand m_TextboxFocusCommand;
+        public ICommand TextboxFocusCommand
+        {
+            get
+            {
+                return m_TextboxFocusCommand ?? (m_TextboxFocusCommand = new CommandHandler(o => DoStartFocus(), () => true));
+            }
+        }
+
+
+        private ICommand m_TextboxEnterCommand;
+        public ICommand TextboxEnterCommand
+        {
+            get
+            {
+                return m_TextboxEnterCommand ?? (m_TextboxEnterCommand = new CommandHandler(o => DoSendTextbox(), () => true));
+            }
+        }
+
 
         #endregion
 
@@ -155,6 +187,18 @@ namespace VRCSTT.ViewModel
             this.AddHistoryPoint(result);
         }
 
+        private void DoStartFocus()
+        {
+            TextboxText = "";
+        }
+
+        private void DoSendTextbox()
+        {
+            OSCHandler.SendOverOSC(TextboxText);
+            this.AddHistoryPoint(TextboxText);
+            this.TextboxText = "";
+        }
+
         private void SetMicrophones()
         {
             m_Microphones.Clear();
@@ -175,7 +219,7 @@ namespace VRCSTT.ViewModel
                 });
             }
 
-            var point = new HistoryPoint() { text = voiceString, ID = Guid.NewGuid() };
+            var point = new HistoryPoint(voiceString, this);
 
             App.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -205,6 +249,50 @@ namespace VRCSTT.ViewModel
 
             if (this.incomingOscClient != null)
                 this.incomingOscClient.BeginReceiving();
+
+        }
+
+        internal void WindowClosing()
+        {
+            STTHandler.AbortSpeaking();
+            cancellationTokenSource.Cancel();
+            SaveFavourites();
+        }
+
+        private void SaveFavourites()
+        {
+            string serialized = JsonSerializer.Serialize(this.Favourites);
+
+            if (!File.Exists(FavouritesFilePath))
+            {
+                var fs = File.Create(FavouritesFilePath);
+                fs.Close();
+            }
+
+            using (StreamWriter sw = new StreamWriter(FavouritesFilePath))
+            {
+                sw.Write(serialized);
+            }
+        }
+
+
+        private void LoadFavourites()
+        {
+            if (!File.Exists(FavouritesFilePath))
+                return;
+
+            using (StreamReader sr = new StreamReader(FavouritesFilePath))
+            {
+                string contents = sr.ReadToEnd();
+                ObservableCollection<HistoryPoint> favourites = JsonSerializer.Deserialize<ObservableCollection<HistoryPoint>>(contents);
+
+                foreach (HistoryPoint favourite in favourites)
+                {
+                    favourite.parent = this;
+                    favourite.m_IsFavourited = true;
+                }
+                this.Favourites = favourites;
+            }
 
         }
     }
