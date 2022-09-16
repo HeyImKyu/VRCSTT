@@ -15,7 +15,7 @@ namespace VRCSTT.Converters
             if (targetType == typeof(Visibility))
             {
                 if ((Visibility)value == Visibility.Visible)
-                    return Visibility.Hidden;
+                    return Visibility.Collapsed;
                 else
                     return Visibility.Visible;
             }
