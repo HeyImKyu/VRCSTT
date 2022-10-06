@@ -44,8 +44,9 @@ namespace VRCSTT.ViewModel
 
         private readonly IncomingOscClient incomingOscClient;
         public CancellationTokenSource cancellationTokenSource { get; private set; }
-        public Task<string> RunningTask { get; private set; }
+        public Task RunningTask { get; private set; }
         private const string FavouritesFilePath = ".\\Favourites.save";
+        private STTHandler sttHandler = new STTHandler();
 
         #endregion
 
@@ -170,21 +171,20 @@ namespace VRCSTT.ViewModel
             cancellationTokenSource = new CancellationTokenSource();
             OSCHandler.IsTyping(true);
 
-            var speakTask = Task.Run(() => STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic, cancellationTokenSource.Token));
-            this.RunningTask = speakTask;
+            var speakTask = Task.Run(() => sttHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic, cancellationTokenSource.Token));
+            this.RunningTask = speakTask.Result;
             MicActivationVisible = Visibility.Visible;
-
 
             var result = await speakTask;
 
             MicActivationVisible = Visibility.Collapsed;
 
-            if (result == "")
-                return;
+            //if (result == "")
+            //    return;
 
-            this.TextboxText = result;
-            OSCHandler.SendOverOSC(result);
-            this.AddHistoryPoint(result);
+            //this.TextboxText = result;
+            //OSCHandler.SendOverOSC(result);
+            //this.AddHistoryPoint(result);
         }
 
         private void DoStartFocus()

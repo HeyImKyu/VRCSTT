@@ -1,8 +1,6 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System;
-using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VRCSTT.Config;
@@ -11,27 +9,71 @@ using VRCSTT.UDT;
 
 namespace VRCSTT.ViewModel
 {
-    internal static class STTHandler
+    internal class STTHandler
     {
-        internal async static Task<string> StartSpeaking(string language, Microphone microphone, bool useStandardMic, CancellationToken ct)
+        private TimeSpan timeOut = TimeSpan.FromSeconds(2);
+        private System.Timers.Timer timer;
+        private SpeechRecognizer speechRecognizer;
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e) => StopRecognition();
+        private void SpeechRecognizer_SessionStopped(object? sender, SessionEventArgs e) => StopRecognition();
+        private void SpeechRecognizer_Canceled(object? sender, SpeechRecognitionCanceledEventArgs e) => StopRecognition();
+        private void SpeechRecognizer_Recognizing(object? sender, SpeechRecognitionEventArgs e)
         {
+            this.timer.Stop();
+            this.timer.Dispose();
+            OSCHandler.AddToSendString(LatinizerHelper.Latinize(e.Result.Text), false);
+
+            this.timer = new System.Timers.Timer();
+            this.timer.Interval = 2000;
+            this.timer.AutoReset = false;
+            this.timer.Elapsed += Timer_Elapsed;
+            this.timer.Start();
+        }
+
+        private void SpeechRecognizer_Recognized(object? sender, SpeechRecognitionEventArgs e)
+        {
+            OSCHandler.AddToSendString(LatinizerHelper.Latinize(e.Result.Text), true);
+
+            StopRecognition();
+        }
+
+        private async Task StopRecognition()
+        {
+            this.timer.Dispose();
+
+            await speechRecognizer.StopContinuousRecognitionAsync();
+            speechRecognizer.Dispose();
+        }
+        
+
+        internal async Task<Task> StartSpeaking(string language, Microphone microphone, bool useStandardMic, CancellationToken ct)
+        {
+            this.timer = new System.Timers.Timer();
+            this.timer.Interval = 2000;
+            this.timer.AutoReset = false;
+            this.timer.Elapsed += Timer_Elapsed;
+            this.timer.Start();
+
             if (STTConfig.SubscriptionKey == "" || STTConfig.SubscriptionKey == null || STTConfig.Region == "" || STTConfig.Region == null)
-                return "Error: Please set SubscriptionKey and Region inside the config file!";
+                ;
 
             var speechConfig = SpeechConfig.FromSubscription(STTConfig.SubscriptionKey, STTConfig.Region);
             speechConfig.SpeechRecognitionLanguage = language;
 
             using var audioConfig = useStandardMic ? AudioConfig.FromDefaultMicrophoneInput() : AudioConfig.FromMicrophoneInput(microphone.ID);
-            using var speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
+            speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
-            var speechRecognitionResult = await speechRecognizer.RecognizeOnceAsync();
+            //var speechRecognitionResult = await speechRecognizer.RecognizeOnceAsync();
 
-            if (ct.IsCancellationRequested)
-                return "";
+            speechRecognizer.Recognizing += SpeechRecognizer_Recognizing;
+            speechRecognizer.Recognized += SpeechRecognizer_Recognized;
+            speechRecognizer.Canceled += SpeechRecognizer_Canceled;
+            speechRecognizer.SessionStopped += SpeechRecognizer_SessionStopped;
 
-            speechRecognizer.Dispose();
-            return OutputSpeechRecognitionResult(speechRecognitionResult);
+            return speechRecognizer.StartContinuousRecognitionAsync();
         }
+
 
         internal async static void AbortSpeaking()
         {
@@ -39,31 +81,6 @@ namespace VRCSTT.ViewModel
             using var speechRecognizer = new SpeechRecognizer(speechConfig);
 
             await speechRecognizer.StopContinuousRecognitionAsync();
-        }
-
-        private static string OutputSpeechRecognitionResult(SpeechRecognitionResult speechRecognitionResult)
-        {
-            string result = speechRecognitionResult.Text.Latinize();
-            switch (speechRecognitionResult.Reason)
-            {
-                case ResultReason.RecognizedSpeech:
-                    return result;
-                case ResultReason.NoMatch:
-                    Console.WriteLine($"NOMATCH: Speech could not be recognized.");
-                    break;
-                case ResultReason.Canceled:
-                    var cancellation = CancellationDetails.FromResult(speechRecognitionResult);
-                    Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
-
-                    if (cancellation.Reason == CancellationReason.Error)
-                    {
-                        Console.WriteLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
-                        Console.WriteLine($"CANCELED: ErrorDetails={cancellation.ErrorDetails}");
-                        Console.WriteLine($"CANCELED: Did you set the speech resource key and region values?");
-                    }
-                    break;
-            }
-            return "";
         }
     }
 }
