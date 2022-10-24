@@ -62,7 +62,7 @@ namespace VRCSTT.UDT
 
         private void DoSendHistoryPoint()
         {
-            OSCHandler.SendOverOSC(Text);
+            OSCHandler.SendOverOSC(Text, 10);
             Console.WriteLine(Text);
         }
 

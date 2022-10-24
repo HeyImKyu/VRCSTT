@@ -119,6 +119,13 @@ namespace VRCSTT.ViewModel
             set { m_OSCIncoming = value; NotifyPropertyChanged(); }
         }
 
+        private int m_SecondsTimer = 10;
+        public int SecondsTimer
+        {
+            get { return m_SecondsTimer;}
+            set { m_SecondsTimer = value; NotifyPropertyChanged(); }
+        }
+
         #endregion
 
         #region Commands
@@ -183,7 +190,7 @@ namespace VRCSTT.ViewModel
                 return;
 
             this.TextboxText = result;
-            OSCHandler.SendOverOSC(result);
+            OSCHandler.SendOverOSC(result, 10);
             this.AddHistoryPoint(result);
         }
 
@@ -194,7 +201,7 @@ namespace VRCSTT.ViewModel
 
         private void DoSendTextbox()
         {
-            OSCHandler.SendOverOSC(TextboxText);
+            OSCHandler.SendOverOSC(TextboxText, 10);
             this.AddHistoryPoint(TextboxText);
             this.TextboxText = "";
         }
