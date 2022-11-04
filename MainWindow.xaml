@@ -7,7 +7,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converters="clr-namespace:VRCSTT.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Closing="Window_Closing">
+        Title="VRCSTT" Height="450" Width="800" Closing="Window_Closing">
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:SubtractValueConverter x:Key="SubtractValueConverter"/>
