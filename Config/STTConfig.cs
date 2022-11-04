@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,5 +43,12 @@ namespace VRCSTT.Config
             if (instance == null)
                 instance = new ConfigProvider();
         }
+
+        internal static void SetDelayTime(int seconds)
+        {
+            CreateInstance();
+            instance.SetDelayTime(seconds);
+        }
     }
+
 }

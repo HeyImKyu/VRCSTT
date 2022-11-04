@@ -3,6 +3,7 @@ using OscCore;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -133,7 +134,7 @@ namespace VRCSTT.ViewModel
             set { m_OSCIncoming = value; NotifyPropertyChanged(); }
         }
 
-        private int m_SecondsTimer = 10;
+        private int m_SecondsTimer;
         public int SecondsTimer
         {
             get { return m_SecondsTimer;}
@@ -277,11 +278,13 @@ namespace VRCSTT.ViewModel
         {
             STTHandler.AbortSpeaking();
             cancellationTokenSource.Cancel();
-            SaveFavourites();
+            SaveFavouritesAndSeconds();
         }
 
-        private void SaveFavourites()
+        private void SaveFavouritesAndSeconds()
         {
+            STTConfig.SetDelayTime(this.m_SecondsTimer);
+
             string serialized = JsonSerializer.Serialize(this.Favourites);
 
             if (!File.Exists(FavouritesFilePath))
@@ -299,6 +302,8 @@ namespace VRCSTT.ViewModel
 
         private void LoadFavourites()
         {
+            this.m_SecondsTimer = STTConfig.DelayTime;
+
             if (!File.Exists(FavouritesFilePath))
                 return;
 
@@ -313,7 +318,6 @@ namespace VRCSTT.ViewModel
                 }
                 this.Favourites = favourites;
             }
-
         }
     }
 }
