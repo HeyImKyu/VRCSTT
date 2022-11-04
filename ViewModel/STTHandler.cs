@@ -35,6 +35,9 @@ namespace VRCSTT.ViewModel
 
         internal async static void AbortSpeaking()
         {
+            if (string.IsNullOrEmpty(STTConfig.SubscriptionKey) || string.IsNullOrEmpty(STTConfig.Region))
+                return;
+
             var speechConfig = SpeechConfig.FromSubscription(STTConfig.SubscriptionKey, STTConfig.Region);
             using var speechRecognizer = new SpeechRecognizer(speechConfig);
 

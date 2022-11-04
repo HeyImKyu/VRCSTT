@@ -3,6 +3,7 @@ using OscCore;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -20,6 +21,18 @@ using VRCSTT.UDT;
 
 namespace VRCSTT.ViewModel
 {
+    internal static class VRCSTTViewModelFactory
+    {
+        private static VRCSTTViewModel m_instance { get; set; }
+
+        public static VRCSTTViewModel GetInstance()
+        {
+            m_instance ??= new VRCSTTViewModel();
+
+            return m_instance;
+        }
+    }
+
     internal class VRCSTTViewModel : INotifyPropertyChanged
     {
         #region Constructor
@@ -34,6 +47,8 @@ namespace VRCSTT.ViewModel
             this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
 
             this.cancellationTokenSource = new CancellationTokenSource();
+
+            this.SecondsTimer = STTConfig.DelayTime;
 
             LoadFavourites();
         }
@@ -119,6 +134,13 @@ namespace VRCSTT.ViewModel
             set { m_OSCIncoming = value; NotifyPropertyChanged(); }
         }
 
+        private int m_SecondsTimer;
+        public int SecondsTimer
+        {
+            get { return m_SecondsTimer;}
+            set { m_SecondsTimer = value; NotifyPropertyChanged(); }
+        }
+
         #endregion
 
         #region Commands
@@ -183,7 +205,7 @@ namespace VRCSTT.ViewModel
                 return;
 
             this.TextboxText = result;
-            OSCHandler.SendOverOSC(result);
+            OSCHandler.SendOverOSC(result, SecondsTimer);
             this.AddHistoryPoint(result);
         }
 
@@ -194,7 +216,7 @@ namespace VRCSTT.ViewModel
 
         private void DoSendTextbox()
         {
-            OSCHandler.SendOverOSC(TextboxText);
+            OSCHandler.SendOverOSC(TextboxText, SecondsTimer);
             this.AddHistoryPoint(TextboxText);
             this.TextboxText = "";
         }
@@ -219,7 +241,7 @@ namespace VRCSTT.ViewModel
                 });
             }
 
-            var point = new HistoryPoint(voiceString, this);
+            var point = new HistoryPoint(voiceString);
 
             App.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -256,11 +278,13 @@ namespace VRCSTT.ViewModel
         {
             STTHandler.AbortSpeaking();
             cancellationTokenSource.Cancel();
-            SaveFavourites();
+            SaveFavouritesAndSeconds();
         }
 
-        private void SaveFavourites()
+        private void SaveFavouritesAndSeconds()
         {
+            STTConfig.SetDelayTime(this.m_SecondsTimer);
+
             string serialized = JsonSerializer.Serialize(this.Favourites);
 
             if (!File.Exists(FavouritesFilePath))
@@ -278,6 +302,8 @@ namespace VRCSTT.ViewModel
 
         private void LoadFavourites()
         {
+            this.m_SecondsTimer = STTConfig.DelayTime;
+
             if (!File.Exists(FavouritesFilePath))
                 return;
 
@@ -288,12 +314,10 @@ namespace VRCSTT.ViewModel
 
                 foreach (HistoryPoint favourite in favourites)
                 {
-                    favourite.parent = this;
                     favourite.m_IsFavourited = true;
                 }
                 this.Favourites = favourites;
             }
-
         }
     }
 }
