@@ -13,7 +13,7 @@ namespace VRCSTT
         public MainWindow()
         {
             InitializeComponent();
-            this.vm = new VRCSTTViewModel();
+            this.vm = VRCSTTViewModelFactory.GetInstance();
             this.DataContext = this.vm;
         }
 

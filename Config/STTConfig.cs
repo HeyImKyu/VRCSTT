@@ -12,6 +12,7 @@ namespace VRCSTT.Config
 
         internal static string SubscriptionKey => GetSubscriptionKey();
         internal static string Region => GetRegionKey(); 
+        internal static int DelayTime => GetDelaySeconds();
 
         internal static string Address = "127.0.0.1";
         internal static int OutgoingPort = 9000;
@@ -28,6 +29,13 @@ namespace VRCSTT.Config
             CreateInstance();
             return instance.GetRegion();
         }
+
+        private static int GetDelaySeconds()
+        {
+            CreateInstance();
+            return instance.GetDelayTime();
+        }
+
 
         private static void CreateInstance()
         {

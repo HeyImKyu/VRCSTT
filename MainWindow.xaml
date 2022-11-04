@@ -77,7 +77,20 @@
             <ComboBox x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}" IsEditable="False"/>
             <CheckBox x:Name="StandardMic" Content="Use Standard Mic" IsChecked="{Binding UseStandardMic}" Margin="0 20 0 0"/>
             <ComboBox x:Name="MicrophoneBox"  ItemsSource="{Binding Microphones}" SelectedItem="{Binding SelectedMicrophone}" DisplayMemberPath="FriendlyName" IsEnabled="{Binding Path=UseStandardMic, Converter={StaticResource InverseBooleanConverter}}" Margin="0 10 0 0"/>
-            <Slider x:Name="TimeSlider" Value="{Binding SecondsTimer}" Minimum="0" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsSelectionRangeEnabled="True" AutoToolTipPlacement="BottomRight" Margin="0 20 0 0"/>
+            <Slider x:Name="TimeSlider" Value="{Binding SecondsTimer}" Minimum="1" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight" IsSelectionRangeEnabled="True" Margin="0 20 0 0"/>
+            <Label>
+                <Label.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SecondsTimer}"/>
+                        <TextBlock Text=" Seconds">
+                            <TextBlock.ToolTip>
+                                <TextBlock Text="Seconds between messages that are longer than max. textbox length"/>
+                            </TextBlock.ToolTip>
+                        </TextBlock>
+                        
+                    </StackPanel>
+                </Label.Content>
+            </Label>
         </StackPanel>
 
         <Grid Grid.Row="0" Grid.Column="5" Grid.RowSpan="4">

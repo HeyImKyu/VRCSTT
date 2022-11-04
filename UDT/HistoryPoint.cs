@@ -10,12 +10,9 @@ namespace VRCSTT.UDT
 {
     internal class HistoryPoint : INotifyPropertyChanged
     {
-        internal VRCSTTViewModel parent;
-
         public HistoryPoint() { }
-        internal HistoryPoint(string text, VRCSTTViewModel parent)
+        internal HistoryPoint(string text)
         {
-            this.parent = parent;
             this.m_Text = text;
             this.m_ID = Guid.NewGuid();
         }
@@ -62,7 +59,7 @@ namespace VRCSTT.UDT
 
         private void DoSendHistoryPoint()
         {
-            OSCHandler.SendOverOSC(Text, 10);
+            OSCHandler.SendOverOSC(Text, VRCSTTViewModelFactory.GetInstance().SecondsTimer);
             Console.WriteLine(Text);
         }
 
@@ -73,13 +70,13 @@ namespace VRCSTT.UDT
 
             if (this.m_IsFavourited)
             {
-                this.parent.Favourites.Add(this);
-                this.parent.VoiceHistory.Remove(this);
+                VRCSTTViewModelFactory.GetInstance().Favourites.Add(this);
+                VRCSTTViewModelFactory.GetInstance().VoiceHistory.Remove(this);
             }
             else
             {
-                this.parent.Favourites.Remove(this);
-                this.parent.VoiceHistory.Add(this);
+                VRCSTTViewModelFactory.GetInstance().Favourites.Remove(this);
+                VRCSTTViewModelFactory.GetInstance().VoiceHistory.Add(this);
             }
         }
 

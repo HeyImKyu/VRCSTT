@@ -20,6 +20,18 @@ using VRCSTT.UDT;
 
 namespace VRCSTT.ViewModel
 {
+    internal static class VRCSTTViewModelFactory
+    {
+        private static VRCSTTViewModel m_instance { get; set; }
+
+        public static VRCSTTViewModel GetInstance()
+        {
+            m_instance ??= new VRCSTTViewModel();
+
+            return m_instance;
+        }
+    }
+
     internal class VRCSTTViewModel : INotifyPropertyChanged
     {
         #region Constructor
@@ -34,6 +46,8 @@ namespace VRCSTT.ViewModel
             this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
 
             this.cancellationTokenSource = new CancellationTokenSource();
+
+            this.SecondsTimer = STTConfig.DelayTime;
 
             LoadFavourites();
         }
@@ -190,7 +204,7 @@ namespace VRCSTT.ViewModel
                 return;
 
             this.TextboxText = result;
-            OSCHandler.SendOverOSC(result, 10);
+            OSCHandler.SendOverOSC(result, SecondsTimer);
             this.AddHistoryPoint(result);
         }
 
@@ -201,7 +215,7 @@ namespace VRCSTT.ViewModel
 
         private void DoSendTextbox()
         {
-            OSCHandler.SendOverOSC(TextboxText, 10);
+            OSCHandler.SendOverOSC(TextboxText, SecondsTimer);
             this.AddHistoryPoint(TextboxText);
             this.TextboxText = "";
         }
@@ -226,7 +240,7 @@ namespace VRCSTT.ViewModel
                 });
             }
 
-            var point = new HistoryPoint(voiceString, this);
+            var point = new HistoryPoint(voiceString);
 
             App.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -295,7 +309,6 @@ namespace VRCSTT.ViewModel
 
                 foreach (HistoryPoint favourite in favourites)
                 {
-                    favourite.parent = this;
                     favourite.m_IsFavourited = true;
                 }
                 this.Favourites = favourites;
