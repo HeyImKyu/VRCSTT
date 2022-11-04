@@ -17,6 +17,7 @@ Welcome to my implementation of a speech-to-text tool for the VRChat textbox.
  - Open the file 'VRCSTT.dll.config'
  - Place the SubscriptionKey and the Region of you Azure speech-recognition service inside the 'Value'-fields.
  - Run 'VRCSTT.exe'
+ - Set the slider to the time that should be waited before sending the remaining part of a message, if it is too long to be sent at once. (VRChat can only display 144 characters at once)
  - Make sure that OSC is enabled ingame (Circle Menu -> Options -> OSC -> Enabled)
 
  # SETUP WITH AVATAR PARAMETER
