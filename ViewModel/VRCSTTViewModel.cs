@@ -141,6 +141,13 @@ namespace VRCSTT.ViewModel
             set { m_SecondsTimer = value; NotifyPropertyChanged(); }
         }
 
+        private bool m_KeepActive;
+        public bool KeepActive
+        {
+            get { return m_KeepActive; }
+            set { m_KeepActive = value; NotifyPropertyChanged(); }
+        }
+
         #endregion
 
         #region Commands
