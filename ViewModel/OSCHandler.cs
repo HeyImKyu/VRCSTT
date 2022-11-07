@@ -23,16 +23,11 @@ namespace VRCSTT.ViewModel
             }
             while (text.Length > 0);
 
-            if (currentSender != null)
-            {
-                currentSender.Dispose();
-                currentSender = null;
-            }
-
+            currentSender?.Dispose();
+           
             currentSender = (new SendingObject(new CancellationTokenSource()));
             await currentSender.SendingLoop(chunks);
 
-            currentSender = null;
             IsTyping(false);
         }
 
@@ -64,29 +59,51 @@ namespace VRCSTT.ViewModel
             {
                 bool keepActive = VRCSTTViewModelFactory.GetInstance().KeepActive;
 
-                if (keepActive)
+                if (keepActive && chunks.Count > 1)
+                    foreach (string text in chunks)
+                        await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, false);
+                else if (keepActive)
                     await DoSend(1.8, chunks[0], false);
                 else
                     foreach (string text in chunks)
                         await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, text.Equals(chunks[chunks.Count - 1]));
             }
             while (VRCSTTViewModelFactory.GetInstance().KeepActive && !cts.IsCancellationRequested && !cts.Token.IsCancellationRequested);
-
         }
 
         private async Task DoSend(double waitTime, string chunk, bool last)
         {
             var message = new OscMessage("/chatbox/input", chunk, true);
 
-            await client.SendAsync(message);
+            try
+            {
+                if (!this.cts.Token.IsCancellationRequested && !this.cts.IsCancellationRequested)
+                    await client.SendAsync(message);
+            }
+            catch (Exception) 
+            {
+                // ObjectDisposedException
+            }
+
             if (!last)
-                await Task.Delay((int)(waitTime * 1000));
+            {
+                try
+                {
+                    await Task.Delay((int)(waitTime * 1000), this.cts.Token);
+                }
+                catch (Exception) 
+                {
+                    // OperationCanceledException
+                    // ObjectDisposedException
+                }
+            }
         }
 
         public void Dispose()
         {
             this.cts.Cancel();
             this.cts.Dispose();
+            this.client.Dispose();
         }
     }
 }
