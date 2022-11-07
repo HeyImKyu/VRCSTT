@@ -216,8 +216,9 @@ namespace VRCSTT.ViewModel
 
         private void DoSendTextbox()
         {
-            OSCHandler.SendOverOSC(TextboxText, SecondsTimer);
-            this.AddHistoryPoint(TextboxText);
+            var latinized = TextboxText.Latinize();
+            OSCHandler.SendOverOSC(latinized, SecondsTimer);
+            this.AddHistoryPoint(latinized);
             this.TextboxText = "";
         }
 
