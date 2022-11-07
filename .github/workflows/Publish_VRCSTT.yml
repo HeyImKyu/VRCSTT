@@ -1,40 +1,50 @@
 name: "Deploy VRCSTT"
 
 on:
-  push:
-    branches: [ "master" ]
+  pull_request:
+    types:
+      - closed
       
 env:
   PROJECT_PATH: VRCSTT.csproj
   
   
 jobs: 
-  deploy: 
+  build: 
     runs-on: windows-latest
+    if: ${{ (github.event.pull_request.merged == true) && !(contains(github.event.pull_request.labels.*.name, 'minor')) }}
     steps: 
       - uses: actions/checkout@v2
       
       - uses: actions/setup-dotnet@v1
         with: 
           dotnet-version: 6.0.x
-          
       - run: dotnet restore ${{ env.PROJECT_PATH }}
-      
       - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
-      
       - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x64 -p:PublishSingleFile=true --no-build -o Program
-      
+      - uses: vimtor/action-zip@v1
+        with:
+          files: Program
+          dest: VRCSTTv${{ github.run_number }}.zip 
+      - uses: actions/upload-artifact@v3
+        with: 
+          name: artifact
+          path: VRCSTTv${{ github.run_number }}.zip
+   
+  deploy:
+    runs-on: windows-latest
+    needs: [build]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+    
       - uses: actions/create-release@v1
         id: create_release
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           tag_name: v${{ github.run_number }}
-          
-      - uses: vimtor/action-zip@v1
-        with:
-          files: Program
-          dest: VRCSTTv${{ github.run_number }}.zip
           
       - uses: csexton/release-asset-action@v2
         with: 
