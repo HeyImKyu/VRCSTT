@@ -11,6 +11,7 @@
     <Window.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:SubtractValueConverter x:Key="SubtractValueConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
         <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
         <Style x:Key="NoButtonStyle" TargetType="Button">
@@ -52,8 +53,13 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Button Style="{StaticResource NoButtonStyle}" x:Name="recordButton" BorderBrush="#01000000" Background="#01000000" Command="{Binding StartRecording}" Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Width="Auto" Height="Auto">
+        <Button Style="{StaticResource NoButtonStyle}" x:Name="recordButton" BorderBrush="#01000000" Background="#01000000" 
+                Command="{Binding StartRecording}" Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" Width="Auto" Height="Auto"
+                IsEnabled="{Binding CurrentSong, Converter={StaticResource InverseBooleanConverter}}">
             <StackPanel Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorLevel=1, AncestorType=Button}, Converter={StaticResource SubtractValueConverter}}" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorLevel=1, AncestorType=Button}, Converter={StaticResource SubtractValueConverter}}" HorizontalAlignment="Center">
+                <Border Background="DimGray" Visibility="{Binding CurrentSong, Converter={StaticResource BoolToVisibilityConverter}}" CornerRadius="60" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorLevel=1, AncestorType=Button}, Converter={StaticResource SubtractValueConverter}}">
+                    <Path Fill="White" Data="M 4619.8 -5021.6 c -918.3 77.5 -1819.1 389.4 -2595.9 904.7 C 1342 -3665.5 770.5 -2999.1 394.7 -2214.5 c -166.6 348.7 -209.2 472.7 -184 536.6 c 21.3 58.1 342.9 341 428.1 377.8 l 54.2 23.2 l -32.9 106.5 c -17.4 60.1 -38.7 112.4 -46.5 120.1 c -5.8 7.7 -98.8 19.4 -207.3 27.1 c -106.5 5.8 -197.6 15.5 -201.5 21.3 c -3.9 3.9 -21.3 75.6 -38.7 156.9 C 15 -114.5 127.3 962.6 458.6 1989.3 l 69.7 213.1 l 42.6 -193.7 c 56.2 -249.9 145.3 -472.7 259.6 -650.9 l 89.1 -139.5 l -52.3 -263.5 c -91 -453.3 -118.2 -742 -106.5 -1154.6 c 11.6 -385.5 25.2 -480.4 131.7 -856.3 c 56.2 -201.5 65.9 -217 114.3 -228.6 c 79.4 -17.4 110.4 -62 203.4 -286.7 c 218.9 -538.6 594.7 -1075.2 1001.6 -1427.8 c 459.1 -399.1 1127.5 -740 1768.7 -900.8 c 1150.7 -290.6 2388.6 -69.7 3409.6 606.4 c 430.1 284.8 732.3 587 1019 1019 c 149.2 224.7 344.9 598.6 414.6 796.2 c 42.6 118.2 94.9 178.2 164.7 193.7 c 50.4 11.6 58.1 27.1 114.3 228.6 c 122 441.7 127.9 492.1 127.9 972.5 c 0 461.1 -29.1 726.5 -124 1144.9 c -31 135.6 -31 160.8 -7.7 193.7 c 137.5 184 261.5 468.8 325.5 751.7 l 42.6 195.7 l 79.4 -251.8 c 279 -881.5 406.8 -1834.6 333.2 -2479.7 c -21.3 -172.4 -73.6 -457.2 -89.1 -472.7 c -3.9 -5.8 -94.9 -15.5 -201.5 -21.3 c -108.5 -7.7 -201.5 -19.4 -207.3 -27.1 c -7.7 -7.7 -29.1 -60.1 -46.5 -120.1 l -32.9 -106.5 l 54.2 -23.2 c 85.2 -36.8 406.8 -319.6 428.1 -377.8 c 25.2 -63.9 -17.4 -184 -178.2 -526.9 c -364.2 -763.3 -951.2 -1458.7 -1606 -1894.6 c -683.8 -455.3 -1456.8 -757.5 -2239.5 -875.6 C 5499.4 -5013.9 4856.2 -5041 4619.8 -5021.6 z M 2421.1 679.7 c -91.1 17.4 -182.1 42.6 -205.4 56.2 c -63.9 34.9 -104.6 112.4 -104.6 197.6 c 0 178.2 300.3 1451 530.8 2249.1 c 149.2 521.1 412.6 1327 451.4 1385.1 c 15.5 23.3 60 58.1 98.8 77.5 c 81.4 38.7 131.7 29.1 393.3 -71.7 c 178.2 -67.8 230.5 -122.1 230.5 -236.4 c 0 -44.6 -62 -267.3 -147.2 -525 c -269.3 -817.5 -540.5 -1832.6 -716.8 -2665.7 c -77.5 -377.8 -98.8 -432 -182.1 -474.6 C 2700 635.2 2630.3 637.1 2421.1 679.7 z M 7213.8 679.7 c -79.4 48.4 -102.7 118.2 -191.8 544.4 c -162.7 794.3 -420.4 1747.4 -705.2 2619.2 c -149.2 453.3 -155 482.4 -131.7 550.2 c 31 94.9 83.3 129.8 313.8 213.1 c 352.6 125.9 372 108.5 585 -556 c 317.7 -984.1 525 -1751.3 720.7 -2665.7 c 87.2 -406.8 93 -484.3 50.4 -567.6 c -38.8 -75.5 -102.7 -104.6 -310 -143.3 C 7324.3 635.2 7287.5 635.2 7213.8 679.7 z M 1677.1 894.8 c -75.6 23.3 -122.1 69.7 -147.2 147.2 c -19.4 56.2 -9.7 125.9 58.1 459.1 c 174.4 842.7 461.1 1908.2 745.8 2754.8 c 145.3 435.9 158.9 466.9 220.8 507.6 c 36.8 25.2 89.1 44.6 118.2 44.6 c 77.5 0 187.9 -52.3 222.8 -102.7 c 27.1 -42.6 17.4 -77.5 -135.6 -538.6 c -323.5 -978.3 -701.3 -2423.5 -833 -3181 C 1909.6 883.1 1822.4 852.1 1677.1 894.8 z M 8122.4 894.8 c -29.1 11.6 -46.5 40.7 -54.2 91.1 c -32.9 184 -193.7 914.4 -280.9 1261.1 C 7612.9 2954.1 7394 3701.9 7177 4341.2 c -102.7 302.2 -106.5 319.6 -75.6 364.2 c 34.9 54.2 135.6 102.7 217 102.7 c 31 0 85.2 -19.4 122 -44.6 c 62 -40.7 75.6 -71.7 232.5 -542.4 c 308 -926 621.9 -2115.5 792.4 -3008.6 c 27.1 -135.6 -1.9 -234.4 -81.4 -286.7 C 8325.8 887 8178.6 869.6 8122.4 894.8 z M 1216.1 1338.4 c -137.5 147.2 -275.1 416.5 -339 656.7 c -65.9 248 -83.3 701.3 -36.8 962.8 c 131.7 761.3 554.1 1412.3 1094.6 1683.5 c 118.2 60 310 127.9 358.4 127.9 c 11.6 0 -48.4 -211.2 -133.7 -470.8 c -282.8 -850.5 -571.5 -1914 -738.1 -2721.9 c -40.7 -193.7 -79.4 -352.6 -87.2 -352.6 C 1326.5 1224.1 1274.2 1274.5 1216.1 1338.4 z M 8571.9 1576.7 c -180.2 856.3 -453.3 1869.5 -732.3 2712.2 c -87.2 265.4 -155 480.4 -149.2 480.4 c 52.3 0 257.6 -69.7 366.1 -124 c 546.3 -277 968.6 -924.1 1098.4 -1693.2 c 46.5 -269.3 29.1 -701.3 -36.8 -957 c -63.9 -240.2 -201.5 -509.5 -339 -656.7 c -58.1 -63.9 -110.4 -114.3 -118.2 -114.3 C 8653.2 1224.1 8614.5 1383 8571.9 1576.7 z" Stretch="Uniform" Margin="15"/>
+                </Border>
                 <Border Background="Red" Visibility="{Binding MicActivationVisible}" CornerRadius="60" Height="{Binding ActualHeight, RelativeSource={RelativeSource AncestorLevel=1, AncestorType=Button}, Converter={StaticResource SubtractValueConverter}}">
                     <Path Fill="White" Data="M176 352c53.02 0 96-42.98 96-96V96c0-53.02-42.98-96-96-96S80 42.98 80 96v160c0 53.02 42.98 96 96 96zm160-160h-16c-8.84 0-16 7.16-16 16v48c0 74.8-64.49 134.82-140.79 127.38C96.71 376.89 48 317.11 48 250.3V208c0-8.84-7.16-16-16-16H16c-8.84 0-16 7.16-16 16v40.16c0 89.64 63.97 169.55 152 181.69V464H96c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16h-56v-33.77C285.71 418.47 352 344.9 352 256v-48c0-8.84-7.16-16-16-16z" Stretch="Uniform" Margin="15"/>
                 </Border>
@@ -62,7 +68,9 @@
                 </Border>
             </StackPanel>
         </Button>
-        <TextBox x:Name="OutputTextbox" Text="{Binding TextboxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" Grid.Column="1" Grid.Row="3" Grid.RowSpan="1" Grid.ColumnSpan="3" Margin="5">
+        <TextBox IsEnabled="{Binding CurrentSong, Converter={StaticResource InverseBooleanConverter}}" 
+                 x:Name="OutputTextbox" Text="{Binding TextboxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                 TextWrapping="Wrap" Grid.Column="1" Grid.Row="3" Grid.RowSpan="1" Grid.ColumnSpan="3" Margin="5">
             <TextBox.InputBindings>
                 <KeyBinding Command="{Binding TextboxEnterCommand}" Key="Enter" />
             </TextBox.InputBindings>
@@ -90,7 +98,9 @@
                     </StackPanel>
                 </Label.Content>
             </Label>
-            <CheckBox Content="Keep Displayed" IsChecked="{Binding KeepActive}" Margin="0 20 0 0"/>
+            <CheckBox IsEnabled="{Binding CurrentSong, Converter={StaticResource InverseBooleanConverter}}" 
+                      Content="Keep Displayed" IsChecked="{Binding KeepActive}" Margin="0 20 0 0"/>
+            <CheckBox Content="Display current song" IsChecked="{Binding CurrentSong}" Margin="0 20 0 0"/>
         </StackPanel>
 
         <Grid Grid.Row="0" Grid.Column="5" Grid.RowSpan="4">
@@ -100,7 +110,8 @@
             </Grid.RowDefinitions>
             <ListView x:Name="HistoryBox" ItemsSource="{Binding VoiceHistory}" Grid.Row="1"
                      Margin="0 0 5 5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch"
+                     IsEnabled="{Binding CurrentSong, Converter={StaticResource InverseBooleanConverter}}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -138,9 +149,10 @@
                 </ListView.ItemContainerStyle>
             </ListView>
 
-            <ListView x:Name="FavouriteBox" ItemsSource="{Binding Favourites}" Grid.Row="0" 
+            <ListView  x:Name="FavouriteBox" ItemsSource="{Binding Favourites}" Grid.Row="0" 
                      Margin="0 5 5 5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                     IsEnabled="{Binding CurrentSong, Converter={StaticResource InverseBooleanConverter}}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
