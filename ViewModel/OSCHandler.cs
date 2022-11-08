@@ -9,6 +9,25 @@ using VRCSTT.Config;
 using VRCSTT.UDT;
 namespace VRCSTT.ViewModel
 {
+    enum DisplayTypes
+    {
+        /// <summary>
+        /// Display a Message or multiple Messages once
+        /// </summary>
+        Once, 
+
+        /// <summary>
+        /// Display a single Message and keep it displayed
+        /// </summary>
+        Keep, 
+
+        /// <summary>
+        /// Keep displayed multiple messages
+        /// Cycles through them
+        /// </summary>
+        CycleMultiple
+    }
+
     internal static class OSCHandler 
     {
         private static SendingObject? currentSender;
@@ -55,18 +74,34 @@ namespace VRCSTT.ViewModel
 
         internal async Task SendingLoop(List<string> chunks)
         {
+            DisplayTypes displayType;
+
             do
             {
                 bool keepActive = VRCSTTViewModelFactory.GetInstance().KeepActive;
 
                 if (keepActive && chunks.Count > 1)
-                    foreach (string text in chunks)
-                        await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, false);
+                    displayType = DisplayTypes.CycleMultiple;
                 else if (keepActive)
-                    await DoSend(1.8, chunks[0], false);
+                    displayType = DisplayTypes.Keep;
                 else
-                    foreach (string text in chunks)
-                        await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, text.Equals(chunks[chunks.Count - 1]));
+                    displayType = DisplayTypes.Once;
+
+
+                switch (displayType)
+                {
+                    case DisplayTypes.Once:
+                        foreach (string text in chunks)
+                            await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, text.Equals(chunks[chunks.Count - 1]));
+                        break;
+                    case DisplayTypes.Keep:
+                        await DoSend(1.8, chunks[0], false);
+                        break;
+                    case DisplayTypes.CycleMultiple:
+                        foreach (string text in chunks)
+                            await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, false);
+                        break;
+                }
             }
             while (VRCSTTViewModelFactory.GetInstance().KeepActive && !cts.IsCancellationRequested && !cts.Token.IsCancellationRequested);
         }
