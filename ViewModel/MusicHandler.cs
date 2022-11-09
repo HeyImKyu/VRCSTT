@@ -18,6 +18,9 @@ namespace VRCSTT.ViewModel
             builder.Append(" - ");
             builder.Append(musicInfo.Media.Title);
 
+            if (musicInfo.Time.EndTime == TimeSpan.Zero)
+                return builder.ToString();
+
             builder.Append(" ");
 
             builder.Append("<");
@@ -25,8 +28,6 @@ namespace VRCSTT.ViewModel
             builder.Append("/");
             builder.Append(musicInfo.Time.EndTime.ToString(@"mm\:ss"));
             builder.Append(">");
-
-
 
             return builder.ToString();
         }
