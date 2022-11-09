@@ -1,4 +1,4 @@
-﻿using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi;
 using OscCore;
 using System;
 using System.Collections.ObjectModel;
@@ -146,6 +146,13 @@ namespace VRCSTT.ViewModel
         {
             get { return m_KeepActive; }
             set { m_KeepActive = value; NotifyPropertyChanged(); }
+        }
+
+        private bool m_CurrentSong;
+        public bool CurrentSong
+        {
+            get { return m_CurrentSong; }
+            set { m_CurrentSong = value; NotifyPropertyChanged(); m_TextboxText = ""; OSCHandler.SendOverOSC("", 0); /* Trigger MusicLoop*/ }
         }
 
         #endregion

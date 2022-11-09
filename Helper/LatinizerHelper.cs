@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VRCSTT.Helper.KanaConverter;
 
 namespace VRCSTT.Helper
 {
@@ -135,7 +134,33 @@ namespace VRCSTT.Helper
                     text += c;
                 }
             }
+
+
+            if (KanaConverter.KanaConverter.ContainsKatakanaCharacters(text) ||
+                KanaConverter.KanaConverter.ContainsHiraganaCharacters(text))
+            {
+                var kanaConverter = KanaConverter.KanaConverter.GetKanaRomajiConverter();
+                text = kanaConverter.Convert(text);
+            }
+
+
+            text = text.RemoveNonLatinChars();
+
             return text;
+        }
+
+        public static string RemoveNonLatinChars(this string s)
+        {
+            var brokenChars = s.Where(c => 
+            !"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".Contains(c) && 
+            !"_-<>!\"\'+-*/|§$%&()[]{}?`´#:;~^°.,\\ ＆【】@".Contains(c));
+
+            foreach (char c in brokenChars)
+            {
+                s = s.Replace(c, '*');
+            }
+
+            return s;
         }
     }
 }
