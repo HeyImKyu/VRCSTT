@@ -10,8 +10,7 @@ namespace VRCSTT.ViewModel
 {
     internal static class MusicHandler
     {
-        private static string lastString;
-        internal static string FormatInformation(MediaInformation musicInfo)
+        private static string FormatInformation(MediaInformation musicInfo)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append(musicInfo.Media.Artist);
@@ -30,6 +29,14 @@ namespace VRCSTT.ViewModel
             builder.Append(">");
 
             return builder.ToString();
+        }
+
+        internal static async Task<string> GetFormattedInfos()
+        {
+            var musicInfo = await MusicHandler.GetMusicInformation();
+            var formatted = MusicHandler.FormatInformation(musicInfo);
+
+            return formatted;
         }
 
         internal static async Task<MediaInformation> GetMusicInformation()

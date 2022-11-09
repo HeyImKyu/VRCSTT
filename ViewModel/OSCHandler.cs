@@ -100,10 +100,7 @@ namespace VRCSTT.ViewModel
                             await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, false);
                         break;
                     case DisplayTypes.NowPlaying:
-                        var musicInfo = await MusicHandler.GetMusicInformation();
-                        var formatted = MusicHandler.FormatInformation(musicInfo);
-
-                        formatted = formatted.Latinize();
+                        var formatted = (await MusicHandler.GetFormattedInfos()).Latinize();
                         VRCSTTViewModelFactory.GetInstance().TextboxText = formatted;
                         await DoSend(1.8, formatted, false);
                         break;
