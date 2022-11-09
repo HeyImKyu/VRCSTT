@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace VRCSTT.Helper.KanaConverter
 {
+    /// <summary>
+    /// Edited Version of https://github.com/pilotMike/KanaConverter
+    /// </summary>
     public struct RomajiKana
     {
         public string Romaji;

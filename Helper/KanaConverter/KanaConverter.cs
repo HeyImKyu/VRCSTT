@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace VRCSTT.Helper.KanaConverter
 {
+    /// <summary>
+    /// Edited Version of https://github.com/pilotMike/KanaConverter
+    /// </summary>
     public abstract class KanaConverter
     {
         // Notes: the difference between hiragana and
