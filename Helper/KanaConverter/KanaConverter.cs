@@ -14,7 +14,7 @@ namespace VRCSTT.Helper.KanaConverter
     {
         // Notes: the difference between hiragana and
         // katakana is 96, with katakana being lower.
-        // Hiragana range is 0x3040 - 0x3096  // Kyu: btw. is it not until 307F?
+        // Hiragana range is 0x3040 - 0x3096
         // Katakana range is 0x30A1 - 0x30FA
 
         protected static List<RomajiKana> Diphthongs;
@@ -66,7 +66,7 @@ namespace VRCSTT.Helper.KanaConverter
         #region StaticFunctions
         public static bool ContainsHiraganaCharacters(string text)
         {
-            return text.Any(s => s > 0x3040 && s <= 0x307F);
+            return text.Any(s => s > 0x3040 && s <= 0x3096);
         }
 
         public static bool ContainsKatakanaCharacters(string text)
