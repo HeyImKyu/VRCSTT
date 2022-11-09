@@ -11,7 +11,7 @@ namespace VRCSTT.ViewModel
     internal static class MusicHandler
     {
         private static string lastString;
-        internal static async Task<string> FormatInformation(MediaInformation musicInfo)
+        internal static string FormatInformation(MediaInformation musicInfo)
         {
             StringBuilder builder = new StringBuilder();
             builder.Append(musicInfo.Media.Artist);
@@ -26,7 +26,7 @@ namespace VRCSTT.ViewModel
             builder.Append(musicInfo.Time.EndTime.ToString(@"mm\:ss"));
             builder.Append(">");
 
-            
+
 
             return builder.ToString();
         }

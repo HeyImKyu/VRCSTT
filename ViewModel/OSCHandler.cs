@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VRCSTT.Config;
 using VRCSTT.Helper;
+using VRCSTT.Helper.KanaConverter;
 using VRCSTT.UDT;
 
 namespace VRCSTT.ViewModel
@@ -100,7 +101,7 @@ namespace VRCSTT.ViewModel
                         break;
                     case DisplayTypes.NowPlaying:
                         var musicInfo = await MusicHandler.GetMusicInformation();
-                        var formatted = await MusicHandler.FormatInformation(musicInfo);
+                        var formatted = MusicHandler.FormatInformation(musicInfo);
 
                         formatted = formatted.Latinize();
                         VRCSTTViewModelFactory.GetInstance().TextboxText = formatted;
@@ -114,8 +115,8 @@ namespace VRCSTT.ViewModel
             (!cts.IsCancellationRequested && !cts.Token.IsCancellationRequested)
             );
         }
-        private async Task DoSend(double waitTime, string chunk, bool last)
-        {
+        private async Task DoSend(double waitTime, string chunk, bool last) 
+        { 
             var message = new OscMessage("/chatbox/input", chunk, true);
             try
             {
