@@ -15,7 +15,7 @@ namespace VRCSTT.ViewModel
     {
         internal async static Task<string> StartSpeaking(string language, Microphone microphone, bool useStandardMic, CancellationToken ct)
         {
-            if (STTConfig.SubscriptionKey == "" || STTConfig.SubscriptionKey == null || STTConfig.Region == "" || STTConfig.Region == null)
+            if (string.IsNullOrEmpty(STTConfig.SubscriptionKey) || string.IsNullOrEmpty(STTConfig.Region))
                 return "Error: Please set SubscriptionKey and Region inside the config file!";
 
             var speechConfig = SpeechConfig.FromSubscription(STTConfig.SubscriptionKey, STTConfig.Region);
