@@ -83,7 +83,7 @@ namespace VRCSTT.ViewModel
                 else if (keepActive && chunks.Count > 1)
                     displayType = DisplayTypes.CycleMultiple;
                 else if (keepActive)
-                    await DoSend(1.8, chunks[0], false);
+                    displayType = DisplayTypes.Keep;
                 else
                     displayType = DisplayTypes.Once;
                 switch (displayType)
