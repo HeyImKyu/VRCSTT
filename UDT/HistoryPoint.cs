@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -60,7 +60,6 @@ namespace VRCSTT.UDT
         private void DoSendHistoryPoint()
         {
             OSCHandler.SendOverOSC(Text, VRCSTTViewModelFactory.GetInstance().SecondsTimer);
-            Console.WriteLine(Text);
         }
 
         private void DoToggleFavourite()
