@@ -1,5 +1,7 @@
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -59,7 +61,7 @@ namespace VRCSTT.UDT
 
         private void DoSendHistoryPoint()
         {
-            OSCHandler.SendOverOSC(Text, VRCSTTViewModelFactory.GetInstance().SecondsTimer);
+            OSCHandler.SendOverOSC(Text, VRCSTTViewModelFactory.GetInstance().SettingsViewModel.SecondsTimer);
         }
 
         private void DoToggleFavourite()
@@ -67,15 +69,17 @@ namespace VRCSTT.UDT
             this.m_IsFavourited = !this.m_IsFavourited;
             NotifyPropertyChanged(nameof(IsFavourited));
 
+            var hvm = VRCSTTViewModelFactory.GetInstance().HomeViewModel;
             if (this.m_IsFavourited)
             {
-                VRCSTTViewModelFactory.GetInstance().Favourites.Add(this);
-                VRCSTTViewModelFactory.GetInstance().VoiceHistory.Remove(this);
+                hvm.Favourites.Add(this);
+                hvm.VoiceHistory.Remove(this);
             }
             else
             {
-                VRCSTTViewModelFactory.GetInstance().Favourites.Remove(this);
-                VRCSTTViewModelFactory.GetInstance().VoiceHistory.Add(this);
+                hvm.Favourites.Remove(this);
+                hvm.VoiceHistory = new ObservableCollection<HistoryPoint>(hvm.VoiceHistory.Skip(1).Take(4));
+                hvm.VoiceHistory.Add(this);
             }
         }
 

@@ -27,6 +27,11 @@
     <PackageReference Include="OscCore" Version="1.0.5" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\HomeView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <None Update="App.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -36,5 +41,11 @@
     <None Update="Helper\KanaConverter\RomajiKana.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\HomeView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

@@ -39,16 +39,11 @@ namespace VRCSTT.ViewModel
 
         internal VRCSTTViewModel()
         {
-            this.SelectedLanguage = this.Languages.FirstOrDefault();
-
-            this.SelectedMicrophone = this.Microphones.FirstOrDefault();
-            this.UseStandardMic = true;
+            this.homeViewModel = new HomeViewModel();
+            this.settingsViewModel = new SettingsViewModel();
+            this.CurrentView = homeViewModel;
 
             this.incomingOscClient = new IncomingOscClient(STTConfig.IncomingPort, ReceiveIncomingCallback);
-
-            this.cancellationTokenSource = new CancellationTokenSource();
-
-            this.SecondsTimer = STTConfig.DelayTime;
 
             LoadFavourites();
         }
@@ -57,74 +52,21 @@ namespace VRCSTT.ViewModel
 
         #region Attributes
 
+        private readonly HomeViewModel homeViewModel;
+        private readonly SettingsViewModel settingsViewModel;
         private readonly IncomingOscClient incomingOscClient;
-        public CancellationTokenSource cancellationTokenSource { get; private set; }
-        public Task<string> RunningTask { get; private set; }
+
         private const string FavouritesFilePath = ".\\Favourites.save";
 
         #endregion
 
         #region Properties
-        public string[] Languages
-        {
-            get
-            {
-                return new string[] { "en-US", "de-DE", "fi-FI" };
-            }
-        }
-        private string m_SelectedLanguage;
 
-        public string SelectedLanguage
+        private object m_currentView;
+        public object CurrentView
         {
-            get { return m_SelectedLanguage; }
-            set { m_SelectedLanguage = value; NotifyPropertyChanged(); }
-        }
-
-        private ObservableCollection<Microphone> m_Microphones = new ObservableCollection<Microphone>();
-        public ObservableCollection<Microphone> Microphones
-        {
-            get
-            {
-                if (m_Microphones.Count == 0)
-                    SetMicrophones();
-
-                return m_Microphones;
-            }
-        }
-
-        private Microphone m_SelectedMicrophone;
-        public Microphone SelectedMicrophone
-        {
-            get { return m_SelectedMicrophone; }
-            set { m_SelectedMicrophone = value; NotifyPropertyChanged(); }
-        }
-
-        private bool m_UseStandardMic;
-        public bool UseStandardMic
-        {
-            get { return m_UseStandardMic; }
-            set { m_UseStandardMic = value; NotifyPropertyChanged(); }
-        }
-
-        private string m_TextboxText;
-        public string TextboxText
-        {
-            get { return m_TextboxText; }
-            set { m_TextboxText = value; NotifyPropertyChanged(); }
-        }
-
-        private ObservableCollection<HistoryPoint> m_VoiceHistory = new ObservableCollection<HistoryPoint>();
-        public ObservableCollection<HistoryPoint> VoiceHistory
-        {
-            get { return m_VoiceHistory; }
-            set { m_VoiceHistory = value; NotifyPropertyChanged(); }
-        }
-
-        private ObservableCollection<HistoryPoint> m_Favourites = new ObservableCollection<HistoryPoint>();
-        public ObservableCollection<HistoryPoint> Favourites
-        {
-            get { return m_Favourites; }
-            set { m_Favourites = value; NotifyPropertyChanged(); }
+            get { return m_currentView; }
+            set { m_currentView = value; NotifyPropertyChanged(); }
         }
 
         private Visibility m_OSCIncoming = Visibility.Collapsed;
@@ -134,143 +76,41 @@ namespace VRCSTT.ViewModel
             set { m_OSCIncoming = value; NotifyPropertyChanged(); }
         }
 
-        private int m_SecondsTimer;
-        public int SecondsTimer
+        public HomeViewModel HomeViewModel
         {
-            get { return m_SecondsTimer;}
-            set { m_SecondsTimer = value; NotifyPropertyChanged(); }
+            get { return this.homeViewModel; }
         }
 
-        private bool m_KeepActive;
-        public bool KeepActive
+        public SettingsViewModel SettingsViewModel
         {
-            get { return m_KeepActive; }
-            set { m_KeepActive = value; NotifyPropertyChanged(); }
-        }
-
-        private bool m_CurrentSong;
-        public bool CurrentSong
-        {
-            get { return m_CurrentSong; }
-            set { m_CurrentSong = value; NotifyPropertyChanged(); m_TextboxText = ""; OSCHandler.SendOverOSC("", 0); /* Trigger MusicLoop*/ }
+            get { return this.settingsViewModel; }
         }
 
         #endregion
 
         #region Commands
 
-        private ICommand m_StartRecording;
-        public ICommand StartRecording
+        private ICommand m_HomeCommand;
+        public ICommand HomeCommand
         {
             get
             {
-                return m_StartRecording ?? (m_StartRecording = new CommandHandler(o => DoStartRecording(), () => true));
+                return m_HomeCommand ?? (m_HomeCommand = new CommandHandler(o => this.CurrentView = homeViewModel, () => true));
             }
         }
 
-        private ICommand m_TextboxFocusCommand;
-        public ICommand TextboxFocusCommand
+        private ICommand m_SettingsCommand;
+        public ICommand SettingsCommand
         {
             get
             {
-                return m_TextboxFocusCommand ?? (m_TextboxFocusCommand = new CommandHandler(o => DoStartFocus(), () => true));
+                return m_SettingsCommand ?? (m_SettingsCommand = new CommandHandler(o => this.CurrentView = settingsViewModel, () => true));
             }
         }
-
-
-        private ICommand m_TextboxEnterCommand;
-        public ICommand TextboxEnterCommand
-        {
-            get
-            {
-                return m_TextboxEnterCommand ?? (m_TextboxEnterCommand = new CommandHandler(o => DoSendTextbox(), () => true));
-            }
-        }
-
 
         #endregion
 
         #region Methods
-
-        private async void DoStartRecording()
-        {
-            // Cancel recording if currently running
-            if (RunningTask != null && !cancellationTokenSource.Token.IsCancellationRequested && !RunningTask.IsCompleted)
-            {
-                STTHandler.AbortSpeaking();
-                cancellationTokenSource.Cancel();
-                MicActivationVisible = Visibility.Collapsed;
-                return;
-            }
-
-            cancellationTokenSource = new CancellationTokenSource();
-            OSCHandler.IsTyping(true);
-
-            var speakTask = Task.Run(() => STTHandler.StartSpeaking(SelectedLanguage, SelectedMicrophone, UseStandardMic, cancellationTokenSource.Token));
-            this.RunningTask = speakTask;
-            MicActivationVisible = Visibility.Visible;
-
-
-            var result = await speakTask;
-
-            MicActivationVisible = Visibility.Collapsed;
-
-            if (result == "")
-                return;
-
-            this.TextboxText = result;
-            OSCHandler.SendOverOSC(result, SecondsTimer);
-            this.AddHistoryPoint(result);
-        }
-
-        private void DoStartFocus()
-        {
-            TextboxText = "";
-        }
-
-        private void DoSendTextbox()
-        {
-            var latinized = TextboxText.Latinize();
-            OSCHandler.SendOverOSC(latinized, SecondsTimer);
-            this.AddHistoryPoint(latinized);
-            this.TextboxText = "";
-        }
-
-        private void SetMicrophones()
-        {
-            m_Microphones.Clear();
-            var enumerator = new MMDeviceEnumerator();
-            foreach (var endpoint in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
-            {
-                m_Microphones.Add(new Microphone() { FriendlyName = endpoint.FriendlyName, ID = endpoint.ID });
-            }
-        }
-
-        private void AddHistoryPoint(string voiceString)
-        {
-            if (m_VoiceHistory.Count >= 5)
-            {
-                App.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    m_VoiceHistory.RemoveAt(0);
-                });
-            }
-
-            var point = new HistoryPoint(voiceString);
-
-            App.Current.Dispatcher.Invoke((Action)delegate
-            {
-                m_VoiceHistory.Add(point);
-            });
-        }
-
-        #endregion
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         private void ReceiveIncomingCallback(IAsyncResult ar)
         {
@@ -282,25 +122,33 @@ namespace VRCSTT.ViewModel
             OscMessage pack = (OscMessage)OscPacket.Read(receiveBytes, 0, receiveBytes.Length);
 
             if (pack.Address == "/avatar/parameters/StartVoiceRecognition" && ((bool)pack.FirstOrDefault()))
-                DoStartRecording();
+                homeViewModel.DoStartRecording();
 
             if (this.incomingOscClient != null)
                 this.incomingOscClient.BeginReceiving();
 
         }
 
+        #endregion
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         internal void WindowClosing()
         {
             STTHandler.AbortSpeaking();
-            cancellationTokenSource.Cancel();
+            homeViewModel.cancellationTokenSource.Cancel();
             SaveFavouritesAndSeconds();
         }
 
         private void SaveFavouritesAndSeconds()
         {
-            STTConfig.SetDelayTime(this.m_SecondsTimer);
+            STTConfig.SetDelayTime(settingsViewModel.SecondsTimer);
 
-            string serialized = JsonSerializer.Serialize(this.Favourites);
+            string serialized = JsonSerializer.Serialize(homeViewModel.Favourites);
 
             if (!File.Exists(FavouritesFilePath))
             {
@@ -317,7 +165,7 @@ namespace VRCSTT.ViewModel
 
         private void LoadFavourites()
         {
-            this.m_SecondsTimer = STTConfig.DelayTime;
+            settingsViewModel.SecondsTimer = STTConfig.DelayTime;
 
             if (!File.Exists(FavouritesFilePath))
                 return;
@@ -331,7 +179,7 @@ namespace VRCSTT.ViewModel
                 {
                     favourite.m_IsFavourited = true;
                 }
-                this.Favourites = favourites;
+                homeViewModel.Favourites = favourites;
             }
         }
     }

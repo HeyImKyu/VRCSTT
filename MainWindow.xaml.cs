@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using VRCSTT.ViewModel;
 
 namespace VRCSTT
@@ -20,6 +21,17 @@ namespace VRCSTT
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.vm.WindowClosing();
+        }
+
+        private void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                this.DragMove();
+        }
+
+        private void Closed_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
