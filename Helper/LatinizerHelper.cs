@@ -153,7 +153,7 @@ namespace VRCSTT.Helper
         {
             var brokenChars = s.Where(c => 
             !"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".Contains(c) && 
-            !"_-<>!\"\'+-*/|§$%&()[]{}?`´#:;~^°.,\\ ＆【】@".Contains(c));
+            !"_-<>!\"\'+-*/|§$%&()[]{}?`´#:;~^°.,\\ ＆【】@=".Contains(c));
 
             foreach (char c in brokenChars)
             {

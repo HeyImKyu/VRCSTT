@@ -74,11 +74,15 @@ namespace VRCSTT.ViewModel
         }
         internal async Task SendingLoop(List<string> chunks)
         {
+            var vm = VRCSTTViewModelFactory.GetInstance();
+            var settings = vm.SettingsViewModel;
+            var home = vm.HomeViewModel;
+
             DisplayTypes displayType = DisplayTypes.Once;
             do
             {
-                bool keepActive = VRCSTTViewModelFactory.GetInstance().KeepActive;
-                if (VRCSTTViewModelFactory.GetInstance().CurrentSong)
+                bool keepActive = settings.KeepActive;
+                if (settings.CurrentSong)
                     displayType = DisplayTypes.NowPlaying;
                 else if (keepActive && chunks.Count > 1)
                     displayType = DisplayTypes.CycleMultiple;
@@ -90,24 +94,24 @@ namespace VRCSTT.ViewModel
                 {
                     case DisplayTypes.Once:
                         foreach (string text in chunks)
-                            await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, text.Equals(chunks[chunks.Count - 1]));
+                            await DoSend(settings.SecondsTimer, text, text.Equals(chunks[chunks.Count - 1]));
                         break;
                     case DisplayTypes.Keep:
                         await DoSend(1.8, chunks[0], false);
                         break;
                     case DisplayTypes.CycleMultiple:
                         foreach (string text in chunks)
-                            await DoSend(VRCSTTViewModelFactory.GetInstance().SecondsTimer, text, false);
+                            await DoSend(settings.SecondsTimer, text, false);
                         break;
                     case DisplayTypes.NowPlaying:
                         var formatted = (await MusicHandler.GetFormattedInfos()).Latinize();
-                        VRCSTTViewModelFactory.GetInstance().TextboxText = formatted;
+                        home.TextboxText = formatted;
                         await DoSend(1.8, formatted, false);
                         break;
                 }
             }
             while (
-            (VRCSTTViewModelFactory.GetInstance().KeepActive || VRCSTTViewModelFactory.GetInstance().CurrentSong)
+            (settings.KeepActive || settings.CurrentSong)
             &&
             (!cts.IsCancellationRequested && !cts.Token.IsCancellationRequested)
             );
