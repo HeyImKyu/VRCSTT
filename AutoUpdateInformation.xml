@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-  <version>36.0.0.0</version>
+  <version>37.0.0.0</version>
   <url>https://github.com/HeyImKyu/VRCSTT/releases/download/v35/VRCSTTv35.zip</url>
   <changelog>https://github.com/HeyImKyu/VRCSTT/releases</changelog>
   <mandatory>true</mandatory>
