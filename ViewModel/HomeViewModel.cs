@@ -149,6 +149,7 @@ namespace VRCSTT.ViewModel
                 settings.SelectedLanguage,
                 settings.SelectedMicrophone,
                 settings.UseStandardMic, 
+                settings.UseTranslateHack,
                 cancellationTokenSource.Token));
             this.RunningTask = speakTask;
             MicActivationVisible = Visibility.Visible;

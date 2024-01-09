@@ -28,6 +28,7 @@
             <CheckBox IsEnabled="{Binding CurrentSong, Converter={converters:InverseBooleanConverter}}" 
                               Content="Keep Displayed" IsChecked="{Binding KeepActive}" Margin="0 20 0 0"/>
             <CheckBox Content="Display current song" IsChecked="{Binding CurrentSong}" Margin="0 20 0 0" IsEnabled="{Binding KeepActive, Converter={converters:InverseBooleanConverter}}"/>
+            <CheckBox x:Name="TranslationHack" Foreground="Beige" FontWeight="Medium" Content="Use Translation Hack" IsChecked="{Binding UseTranslateHack}" Margin="0 20 0 0"/>
         </StackPanel>
     </Grid>
 </UserControl>
