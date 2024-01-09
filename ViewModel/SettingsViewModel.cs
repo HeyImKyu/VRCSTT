@@ -33,6 +33,8 @@ namespace VRCSTT.ViewModel
             this.SelectedMicrophone = Microphones.FirstOrDefault();
             this.UseStandardMic = true;
             this.SecondsTimer = STTConfig.DelayTime;
+
+            this.UseTranslateHack = false;
         }
 
         #endregion
@@ -107,6 +109,15 @@ namespace VRCSTT.ViewModel
                 OSCHandler.SendOverOSC("", 0); // Trigger MusicLoop
             }
         }
+
+
+        private bool m_UseTranslateHack;
+        public bool UseTranslateHack
+        {
+            get { return m_UseTranslateHack; }
+            set { m_UseTranslateHack = value; }
+        }
+
 
         #endregion
 
