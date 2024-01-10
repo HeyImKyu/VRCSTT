@@ -15,11 +15,16 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <DebugType>embedded</DebugType>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <AssemblyVersion>36.0.0</AssemblyVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="AssemblyInfo.cs~RF1c001da8.TMP" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.8.4" />
     <PackageReference Include="EasyNetQ" Version="7.2.0" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.23.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />

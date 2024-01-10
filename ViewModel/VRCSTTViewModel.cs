@@ -1,3 +1,4 @@
+using AutoUpdaterDotNET;
 using NAudio.CoreAudioApi;
 using OscCore;
 using System;
@@ -8,12 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using VRCSTT.Config;
 using VRCSTT.Helper;
@@ -39,6 +42,25 @@ namespace VRCSTT.ViewModel
 
         internal VRCSTTViewModel()
         {
+            // If theres a backup file, an update has just occured and we need to load from the backup file
+            if (File.Exists(".\\VRCSTT.dll.config.bak"))
+            {
+                try
+                {
+                    File.Copy(".\\VRCSTT.dll.config.bak", ".\\VRCSTT.dll.config", true);
+                    File.Delete(".\\VRCSTT.dll.config.bak");
+                }
+                catch 
+                {
+                    System.Windows.Forms.MessageBox.Show(
+                        @"There was an error loading the file from before the update. You can just remove the bak from 'VRCSTT.dll.config.bak' to load the backup manually.",
+                        @"Config loading failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            AutoUpdater.CheckForUpdateEvent += AutoUpdaterHandler.AutoUpdaterOnCheckForUpdateEvent;
+            AutoUpdaterHandler.Start();
+
             this.homeViewModel = new HomeViewModel();
             this.settingsViewModel = new SettingsViewModel();
             this.CurrentView = homeViewModel;

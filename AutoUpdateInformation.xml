@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <item>
-  <version>36.0.0</version>
-  <url>https://drive.usercontent.google.com/download?id=1v2T-gQc0ts4z5czySLLNnFABvRtNnWG_&export=download&authuser=0&confirm=t&uuid=33d6cd7d-fbf9-46ce-9147-b0b8d0f4229d&at=APZUnTXX-mII7tE0lHWdMJ3hvG-n:1704830683297</url>
-  <changelog>https://github.com/HeyImKyu/VRCSTT/releases</changelog>
-  <mandatory>true</mandatory>
+	<version>36.0.0</version>
+	<url>https://github.com/HeyImKyu/VRCSTT/releases/download/v36/VRCSTTv36.zip</url>
+	<changelog>https://github.com/HeyImKyu/VRCSTT/releases</changelog>
+	<mandatory>true</mandatory>
 </item>
