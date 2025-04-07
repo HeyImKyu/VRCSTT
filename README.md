@@ -10,7 +10,7 @@ Welcome to my implementation of a speech-to-text tool for the VRChat textbox.
                 you are welcome to do so, but it WILL have bugs and i don't know if i'll even continue develpoment here.\
                 If you want a program that just works out of the box, check out https://vrcstt.com/.
                 
-# SETUP
+# Setup
 
  - Look for the newest release on the [Release Page](https://github.com/HeyImKyu/VRCSTT/releases) and download the .zip
  - Unpack it somewhere
@@ -20,7 +20,7 @@ Welcome to my implementation of a speech-to-text tool for the VRChat textbox.
  - Set the slider to the time that should be waited before sending the remaining part of a message, if it is too long to be sent at once. (VRChat can only display 144 characters at once)
  - Make sure that OSC is enabled ingame (Circle Menu -> Options -> OSC -> Enabled)
 
- # SETUP WITH AVATAR PARAMETER
+ # Setup with Avatar Parameter
 
  - Follow the normal setup above
  - Add an ExpressionParameter to your avatar called "StartVoiceRecognition" (boolean, default false)
