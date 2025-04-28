@@ -2,6 +2,8 @@
 
 [![Deploy VRCSTT](https://github.com/HeyImKyu/VRCSTT/actions/workflows/Publish_VRCSTT.yml/badge.svg)](https://github.com/HeyImKyu/VRCSTT/actions/workflows/Publish_VRCSTT.yml)
 
+![Screenshot 2025-04-28 170305](https://github.com/user-attachments/assets/6dc99334-4c89-4e77-8b6b-d1420ca69a99)
+
 Welcome to my implementation of a speech-to-text tool for the VRChat textbox.
 
 **Disclaimer:** You will need a Microsoft Azure Speech-Recognition service. 
